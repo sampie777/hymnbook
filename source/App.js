@@ -10,9 +10,9 @@ import React from "react";
 import { SafeAreaView, StatusBar, StyleSheet, View } from "react-native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { NavigationContainer } from "@react-navigation/native";
-import { routes } from "./source/navigation";
-import SearchScreen from "./source/screens/SearchScreen";
-import ReactNativeInfoScreen from "./source/screens/ReactNativeInfoScreen";
+import { routes } from "./navigation";
+import SearchScreen from "./screens/SearchScreen";
+import ReactNativeInfoScreen from "./screens/ReactNativeInfoScreen";
 
 const Drawer = createDrawerNavigator();
 
