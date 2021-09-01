@@ -17,6 +17,7 @@ import SongDisplayScreen from "./screens/SongDisplayScreen";
 import Db from "./db";
 import { Song } from "./models/Song";
 import CustomDrawerContent from "./components/CustomDrawerContent";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const Drawer = createDrawerNavigator();
 
@@ -61,12 +62,16 @@ export default function App() {
       <NavigationContainer>
         <Drawer.Navigator initialRouteName={routes.Search}
                           drawerContent={CustomDrawerContent}>
-          <Drawer.Screen name={routes.Search} component={SearchScreen} />
+          <Drawer.Screen name={routes.Search} component={SearchScreen}
+                         options={{
+                           drawerIcon: ({ focused, color, size }) =>
+                             <Icon name="search" size={size} color={color} />,
+                         }} />
           <Drawer.Screen name={routes.Home} component={ReactNativeInfoScreen} />
           <Drawer.Screen name={routes.Song} component={SongDisplayScreen}
                          initialParams={{ title: undefined }}
                          options={{
-                           hideInMenu: true
+                           hideInMenu: true,
                          }} />
         </Drawer.Navigator>
       </NavigationContainer>

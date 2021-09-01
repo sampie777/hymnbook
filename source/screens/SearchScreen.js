@@ -3,6 +3,7 @@ import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native
 import Db from "../db";
 import { Song } from "../models/Song";
 import { routes } from "../navigation";
+import Icon from "react-native-vector-icons/MaterialIcons";
 
 const Key = ({ children, onPress, extraStyle }) => {
   const keyTextStyle = [styles.keyText];
@@ -34,7 +35,7 @@ export default function SearchScreen({ navigation }) {
   const [inputValue, setInputValue] = useState("");
   const [results, setSearchResult] = useState([]);
 
-  const maxInputLength = 4;
+  const maxInputLength = 3;
   const maxResultsLength = 10;
 
   useEffect(() => {
@@ -81,8 +82,10 @@ export default function SearchScreen({ navigation }) {
     setSearchResult(results);
   };
 
-  const onSearchResultItemPress = (song) =>
+  const onSearchResultItemPress = (song) => {
     navigation.navigate(routes.Song, { title: song.title });
+    setInputValue("");
+  };
 
   const renderSearchResultItem = ({ item }) => (
     <SearchResultItem song={item} onPress={onSearchResultItemPress} />
@@ -121,7 +124,9 @@ export default function SearchScreen({ navigation }) {
                extraStyle={styles.specialKeyText}>Clear</Key>
           <NumberKey number={0} onPress={onNumberKeyPress} />
           <Key onPress={onDeleteKeyPress}
-               extraStyle={styles.specialKeyText}>Del</Key>
+               extraStyle={styles.specialKeyText}>
+            <Icon name="backspace" size={styles.keyText.fontSize - 10} color={styles.keyText.color} />
+          </Key>
         </View>
       </View>
     </View>
@@ -151,6 +156,12 @@ const styles = StyleSheet.create({
     fontSize: 100,
     fontFamily: "sans-serif-light",
     color: "#555",
+    borderStyle: "dashed",
+    borderBottomWidth: 2,
+    borderBottomColor: "#ddd",
+    minWidth: 140,
+    paddingLeft: 40,
+    paddingRight: 40,
   },
 
   searchList: {
