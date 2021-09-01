@@ -16,6 +16,7 @@ import ReactNativeInfoScreen from "./screens/ReactNativeInfoScreen";
 import SongDisplayScreen from "./screens/SongDisplayScreen";
 import Db from "./db";
 import { Song } from "./models/Song";
+import CustomDrawerContent from "./components/CustomDrawerContent";
 
 const Drawer = createDrawerNavigator();
 
@@ -27,18 +28,15 @@ export default function App() {
 
   const fillDatabaseWithMockValues = () => {
     Db.realm.write(() => {
-      Db.realm.create(Song.schema.name, new Song({
-        title: "Psalm 100",
-        content: "Yolo",
-      }));
-      Db.realm.create(Song.schema.name, new Song({
-        title: "Psalm 3",
-        content: "Yolo",
-      }));
-      Db.realm.create(Song.schema.name, new Song({
-        title: "Psalm 004",
-        content: "Yolo",
-      }));
+      Db.realm.create(Song.schema.name, new Song({ title: "Psalm 1", content: "Yolo" }));
+      Db.realm.create(Song.schema.name, new Song({ title: "Psalm 2", content: "Yolo" }));
+      Db.realm.create(Song.schema.name, new Song({ title: "Psalm 3", content: "Yolo" }));
+      Db.realm.create(Song.schema.name, new Song({ title: "Psalm 004", content: "Yolo" }));
+      Db.realm.create(Song.schema.name, new Song({ title: "Psalm 100", content: "Yolo" }));
+      Db.realm.create(Song.schema.name, new Song({ title: "Psalm 101", content: "Yolo" }));
+      Db.realm.create(Song.schema.name, new Song({ title: "Psalm 102", content: "Yolo" }));
+      Db.realm.create(Song.schema.name, new Song({ title: "Psalm 111", content: "Yolo" }));
+      Db.realm.create(Song.schema.name, new Song({ title: "Psalm 150", content: "Yolo" }));
     });
 
     console.log("Songs: " + Db.realm.objects(Song.schema.name).map((it) => `${it._id} ${it.title}`));
@@ -61,10 +59,15 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <NavigationContainer>
-        <Drawer.Navigator initialRouteName={routes.Search}>
+        <Drawer.Navigator initialRouteName={routes.Search}
+                          drawerContent={CustomDrawerContent}>
           <Drawer.Screen name={routes.Search} component={SearchScreen} />
           <Drawer.Screen name={routes.Home} component={ReactNativeInfoScreen} />
-          <Drawer.Screen name={routes.Song} component={SongDisplayScreen} initialParams={{title: undefined}} />
+          <Drawer.Screen name={routes.Song} component={SongDisplayScreen}
+                         initialParams={{ title: undefined }}
+                         options={{
+                           hideInMenu: true
+                         }} />
         </Drawer.Navigator>
       </NavigationContainer>
 
