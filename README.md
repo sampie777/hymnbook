@@ -48,4 +48,4 @@ Make sure keystore is correctly defined in:
 ## To do
 
 - Match Android font families with IOS families.
-
+- Fix default sorting mechanism for song titles (102 is displayed before 2 but should be the other way around)

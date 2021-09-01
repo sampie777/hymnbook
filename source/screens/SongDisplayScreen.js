@@ -2,58 +2,40 @@ import React, { useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { Song } from "../models/Song";
 import { useFocusEffect } from "@react-navigation/native";
+import Db from "../db";
 
-const ContentVerse = ({children}) => {
-  return (
-    <Text style={styles.contentText}>{children}</Text>
-  )
-}
+const ContentVerse = ({ children }) => (
+  <Text style={styles.contentText}>{children}</Text>
+);
 
-export default function SongDisplayScreen() {
+export default function SongDisplayScreen({ route }) {
   const [song, setSong] = useState(undefined);
 
   const loadSong = () => {
-    const newSong = Song(0, "Psalm 150", "I'm a verse!" +
-      "\nWhat about new lines?" +
-      " Wha t a b o u t n e w l i n es?" +
-      " What about new lines?" +
-      "\nWhat about new lines?" +
-      "\nWhat about new lines?" +
-      "\nWhat about new lines?" +
-      "\n" +
-      "\nWhat about new lines?" +
-      "\nWhat about new lines?" +
-      "\nWhat about new lines?" +
-      "\nWhat about new lines?" +
-      "\n" +
-      "\nWhat about new lines?" +
-      "\nWhat about new lines?" +
-      "\nWhat about new lines?" +
-      "\nWhat about new lines?" +
-      "\n" +
-      "\nWhat about new lines?" +
-      "\nWhat about new lines?" +
-      "\nWhat about new lines?" +
-      "\nWhat about new lines?" +
-      "\n" +
-      "\nWhat about new lines?" +
-      "\nWhat about new lines?" +
-      "\nWhat about new lines?" +
-      "\nWhat about new lines?" +
-      "\n" +
-      "\nWhat about new lines?" +
-      "\nWhat about new lines?" +
-      "\nWhat about new lines?" +
-      "\nWhat about new lines?" +
-      "\nLast line");
+    if (!Db.isConnected()) {
+      return;
+    }
+
+    if (route.params.title === undefined) {
+      setSong(undefined);
+      return;
+    }
+
+    const newSong = Db.realm.objects(Song.schema.name)
+      .find((it) => it.title === route.params.title);
+
+    if (newSong === undefined) {
+      // Song not found
+    }
+
     setSong(newSong);
   };
 
   useFocusEffect(
     React.useCallback(() => {
       loadSong();
-      return () => setSong(null);
-    }, []),
+      return () => setSong(undefined);
+    }, [route.params.title]),
   );
 
   const renderContentItem = ({ item }) => (
@@ -68,8 +50,7 @@ export default function SongDisplayScreen() {
       <FlatList
         data={song ? song.content.split("\n") : ["No song loaded..."]}
         renderItem={renderContentItem}
-        contentContainerStyle={styles.contentSectionList}>
-      </FlatList>
+        contentContainerStyle={styles.contentSectionList} />
     </View>
   );
 }

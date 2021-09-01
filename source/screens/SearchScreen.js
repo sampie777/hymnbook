@@ -1,30 +1,46 @@
-import React, { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Db from "../db";
+import { Song } from "../models/Song";
+import { routes } from "../navigation";
 
 const Key = ({ children, onPress, extraStyle }) => {
   const keyTextStyle = [styles.keyText];
   if (extraStyle !== undefined && extraStyle !== null) {
     keyTextStyle.push(extraStyle);
   }
+
   return (
     <TouchableOpacity style={styles.key}
-                        onPress={onPress}>
+                      onPress={onPress}>
       <Text style={keyTextStyle}>{children}</Text>
     </TouchableOpacity>
   );
 };
 
-const NumberKey = ({ number, onPress }) => {
-  return (
-    <Key onPress={() => onPress(number)}>
-      {number}
-    </Key>
-  );
-};
+const NumberKey = ({ number, onPress }) => (
+  <Key onPress={() => onPress(number)}>
+    {number}
+  </Key>
+);
 
-export default function SearchScreen({}) {
+const SearchResultItem = ({ song, onPress }) => (
+  <TouchableOpacity onPress={() => onPress(song)}>
+    <Text style={styles.searchListItem}>{song.title}</Text>
+  </TouchableOpacity>
+);
+
+export default function SearchScreen({ navigation }) {
   const [inputValue, setInputValue] = useState("");
+  const [results, setSearchResult] = useState([]);
+
   const maxInputLength = 4;
+  const maxResultsLength = 10;
+
+  useEffect(() => {
+    fetchSearchResults();
+    return () => null;
+  }, [inputValue]);
 
   const onNumberKeyPress = (number) => {
     if (inputValue.length >= maxInputLength) {
@@ -47,12 +63,42 @@ export default function SearchScreen({}) {
     setInputValue("");
   };
 
+  const fetchSearchResults = () => {
+    if (!Db.isConnected()) {
+      return;
+    }
+    const query = inputValue;
+
+    if (query.length === 0) {
+      setSearchResult([]);
+      return;
+    }
+
+    const results = Db.realm.objects(Song.schema.name)
+      .sorted("title")
+      .filtered(`title CONTAINS "${query}" LIMIT(${maxResultsLength})`);
+
+    setSearchResult(results);
+  };
+
+  const onSearchResultItemPress = (song) =>
+    navigation.navigate(routes.Song, { title: song.title });
+
+  const renderSearchResultItem = ({ item }) => (
+    <SearchResultItem song={item} onPress={onSearchResultItemPress} />
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
         <Text style={styles.infoText}>Enter song number:</Text>
         <Text style={styles.inputTextField}>{inputValue}</Text>
       </View>
+
+      <FlatList
+        data={results}
+        renderItem={renderSearchResultItem}
+        contentContainerStyle={styles.searchList} />
 
       <View style={styles.keyPad}>
         <View style={styles.keyPadRow}>
@@ -71,9 +117,11 @@ export default function SearchScreen({}) {
           <NumberKey number={9} onPress={onNumberKeyPress} />
         </View>
         <View style={styles.keyPadRow}>
-          <Key onPress={onClearKeyPress} extraStyle={styles.specialKeyText}>Clear</Key>
+          <Key onPress={onClearKeyPress}
+               extraStyle={styles.specialKeyText}>Clear</Key>
           <NumberKey number={0} onPress={onNumberKeyPress} />
-          <Key onPress={onDeleteKeyPress} extraStyle={styles.specialKeyText}>Del</Key>
+          <Key onPress={onDeleteKeyPress}
+               extraStyle={styles.specialKeyText}>Del</Key>
         </View>
       </View>
     </View>
@@ -90,6 +138,8 @@ const styles = StyleSheet.create({
   inputContainer: {
     flex: 1,
     alignItems: "center",
+    flexBasis: 200,
+    flexGrow: 0,
   },
   infoText: {
     fontSize: 18,
@@ -103,8 +153,24 @@ const styles = StyleSheet.create({
     color: "#555",
   },
 
+  searchList: {
+    flexGrow: 1,
+    justifyContent: "flex-start",
+    paddingBottom: 10,
+  },
+  searchListItem: {
+    fontSize: 24,
+    padding: 15,
+    marginBottom: 1,
+    backgroundColor: "#fcfcfc",
+    borderColor: "#ddd",
+    borderBottomWidth: 1,
+  },
+
   keyPad: {
     flex: 1,
+    flexBasis: 300,
+    flexGrow: 0,
   },
   keyPadRow: {
     flex: 1,
