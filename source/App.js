@@ -13,6 +13,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { routes } from "./navigation";
 import SearchScreen from "./screens/SearchScreen";
 import ReactNativeInfoScreen from "./screens/ReactNativeInfoScreen";
+import SongDisplayScreen from "./screens/SongDisplayScreen";
 
 const Drawer = createDrawerNavigator();
 
@@ -23,6 +24,7 @@ export default function App() {
         <Drawer.Navigator initialRouteName={routes.Search}>
           <Drawer.Screen name={routes.Search} component={SearchScreen} />
           <Drawer.Screen name={routes.Home} component={ReactNativeInfoScreen} />
+          <Drawer.Screen name={routes.Song} component={SongDisplayScreen} />
         </Drawer.Navigator>
       </NavigationContainer>
 

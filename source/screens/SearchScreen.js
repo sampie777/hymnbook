@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ScrollView, StyleSheet, Text, TouchableHighlight, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const Key = ({ children, onPress, extraStyle }) => {
   const keyTextStyle = [styles.keyText];
@@ -7,10 +7,10 @@ const Key = ({ children, onPress, extraStyle }) => {
     keyTextStyle.push(extraStyle);
   }
   return (
-    <TouchableHighlight style={styles.key}
+    <TouchableOpacity style={styles.key}
                         onPress={onPress}>
       <Text style={keyTextStyle}>{children}</Text>
-    </TouchableHighlight>
+    </TouchableOpacity>
   );
 };
 
