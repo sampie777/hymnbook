@@ -13,6 +13,13 @@ export default function SongDisplayScreen({ route }) {
   const [song, setSong] = useState(undefined);
   const [isLoading, setIsLoading] = useState(false);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      loadSong();
+      return () => setSong(undefined);
+    }, [route.params.title]),
+  );
+
   const loadSong = () => {
     if (!Db.isConnected()) {
       return;
@@ -25,7 +32,7 @@ export default function SongDisplayScreen({ route }) {
       return;
     }
 
-    const newSong = Db.realm.objects(Song.schema.name)
+    const newSong = Db.realm().objects(Song.schema.name)
       .find((it) => it.title === route.params.title);
 
     if (newSong === undefined) {
@@ -35,13 +42,6 @@ export default function SongDisplayScreen({ route }) {
     setSong(newSong);
     setIsLoading(false);
   };
-
-  useFocusEffect(
-    React.useCallback(() => {
-      loadSong();
-      return () => setSong(undefined);
-    }, [route.params.title]),
-  );
 
   const renderContentItem = ({ item }) => (
     <ContentVerse>{item}</ContentVerse>

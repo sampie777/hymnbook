@@ -20,6 +20,19 @@ yarn android
 npx react-native run-android
 ```
 
+### Rebuild
+
+If things aren't going as planned, rebuild the whole project:
+
+```bash
+cd android/
+./gradlew clean
+cd ..
+
+
+yarn start --reset-cache 
+```
+
 ## Build
 
 ### Android 
