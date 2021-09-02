@@ -3,6 +3,7 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
 import { Song } from "../models/Song";
 import { useFocusEffect } from "@react-navigation/native";
 import Db from "../db";
+import LoadingOverlay from "../components/LoadingOverlay";
 
 const ContentVerse = ({ children }) => (
   <Text style={styles.contentText}>{children}</Text>
@@ -10,14 +11,17 @@ const ContentVerse = ({ children }) => (
 
 export default function SongDisplayScreen({ route }) {
   const [song, setSong] = useState(undefined);
+  const [isLoading, setIsLoading] = useState(false);
 
   const loadSong = () => {
     if (!Db.isConnected()) {
       return;
     }
+    setIsLoading(true);
 
     if (route.params.title === undefined) {
       setSong(undefined);
+      setIsLoading(false);
       return;
     }
 
@@ -29,6 +33,7 @@ export default function SongDisplayScreen({ route }) {
     }
 
     setSong(newSong);
+    setIsLoading(false);
   };
 
   useFocusEffect(
@@ -48,9 +53,11 @@ export default function SongDisplayScreen({ route }) {
         <Text style={styles.titleText}>{song ? song.title : ""}</Text>
       </View>
       <FlatList
-        data={song ? song.content.split("\n") : ["No song loaded..."]}
+        data={song ? song.content.split("\n") : []}
         renderItem={renderContentItem}
         contentContainerStyle={styles.contentSectionList} />
+
+      <LoadingOverlay isVisible={isLoading} />
     </View>
   );
 }

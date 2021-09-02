@@ -67,7 +67,6 @@ export default function App() {
                            drawerIcon: ({ focused, color, size }) =>
                              <Icon name="search" size={size} color={color} />,
                          }} />
-          <Drawer.Screen name={routes.Home} component={ReactNativeInfoScreen} />
           <Drawer.Screen name={routes.Song} component={SongDisplayScreen}
                          initialParams={{ title: undefined }}
                          options={{
