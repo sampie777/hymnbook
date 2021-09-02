@@ -13,16 +13,26 @@ const Footer = () => (
   <View style={styles.footer} />
 );
 
-export default function SongDisplayScreen({ route }) {
+export default function SongDisplayScreen({ route, navigation }) {
   const [song, setSong] = useState(undefined);
   const [isLoading, setIsLoading] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
-      loadSong();
-      return () => setSong(undefined);
+      onFocus();
+      return onBlur;
     }, [route.params.title]),
   );
+
+  const onFocus = () => {
+    navigation.setOptions({ title: route.params.title });
+    loadSong();
+  }
+
+  const onBlur = () => {
+    setSong(undefined);
+    navigation.setOptions({ title: "" });
+  }
 
   const loadSong = () => {
     if (!Db.isConnected()) {
@@ -53,9 +63,6 @@ export default function SongDisplayScreen({ route }) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.titleSection}>
-        <Text style={styles.titleText}>{song ? song.title : ""}</Text>
-      </View>
       <FlatList
         data={song ? song.content.split("\n\n") : []}
         renderItem={renderContentItem}
@@ -73,17 +80,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",
     alignItems: "stretch",
-  },
-
-  titleSection: {
-    flexBasis: 55,
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    paddingLeft: 20,
-  },
-  titleText: {
-    fontSize: 26,
   },
 
   contentSectionList: {
