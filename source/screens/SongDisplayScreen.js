@@ -9,6 +9,10 @@ const ContentVerse = ({ children }) => (
   <Text style={styles.contentText}>{children}</Text>
 );
 
+const Footer = () => (
+  <View style={styles.footer} />
+);
+
 export default function SongDisplayScreen({ route }) {
   const [song, setSong] = useState(undefined);
   const [isLoading, setIsLoading] = useState(false);
@@ -53,9 +57,10 @@ export default function SongDisplayScreen({ route }) {
         <Text style={styles.titleText}>{song ? song.title : ""}</Text>
       </View>
       <FlatList
-        data={song ? song.content.split("\n") : []}
+        data={song ? song.content.split("\n\n") : []}
         renderItem={renderContentItem}
-        contentContainerStyle={styles.contentSectionList} />
+        contentContainerStyle={styles.contentSectionList}
+        ListFooterComponent={<Footer />} />
 
       <LoadingOverlay isVisible={isLoading} />
     </View>
@@ -89,5 +94,14 @@ const styles = StyleSheet.create({
   },
   contentText: {
     fontSize: 18,
+    marginBottom: 30,
+  },
+
+  footer: {
+    borderTopColor: "#ccc",
+    borderTopWidth: 1,
+    width: "50%",
+    marginTop: 70,
+    alignSelf: "center",
   },
 });

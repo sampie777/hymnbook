@@ -70,7 +70,7 @@ export default function App() {
           <Drawer.Screen name={routes.Import} component={DownloadSongsScreen}
                          options={{
                            drawerIcon: ({ focused, color, size }) =>
-                             <Icon name="download" size={size} color={color} />,
+                             <Icon name="database" size={size} color={color} />,
                          }} />
           <Drawer.Screen name={routes.Song} component={SongDisplayScreen}
                          initialParams={{ title: undefined }}
