@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 25,
-    elevation: 2,
+    elevation: 1,
     marginHorizontal: 10,
   },
   buttonOpen: {
