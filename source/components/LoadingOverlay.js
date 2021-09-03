@@ -2,15 +2,19 @@ import React from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
 
-export default function LoadingOverlay({ isVisible }) {
+export default function LoadingOverlay({ isVisible, text }) {
   if (!isVisible) {
     return null;
+  }
+
+  if (text === undefined) {
+    text = "Loading...";
   }
 
   return (
     <View style={styles.container}>
       <ActivityIndicator size={styles.icon.fontSize} color={styles.icon.color} />
-      <Text style={styles.text}>Loading...</Text>
+      {text === "" || text === null ? null : <Text style={styles.text}>{text}</Text>}
     </View>
   );
 }

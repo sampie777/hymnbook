@@ -73,7 +73,10 @@ export default function App() {
                              <Icon name="database" size={size} color={color} />,
                          }} />
           <Drawer.Screen name={routes.Song} component={SongDisplayScreen}
-                         initialParams={{ title: undefined }}
+                         initialParams={{
+                           title: undefined,
+                           query: undefined,
+                         }}
                          options={{
                            hideInMenu: true,
                          }} />
