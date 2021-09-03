@@ -5,8 +5,11 @@ import { useFocusEffect } from "@react-navigation/native";
 import Db from "../db";
 import LoadingOverlay from "../components/LoadingOverlay";
 
-const ContentVerse = ({ children }) => (
-  <Text style={styles.contentText}>{children}</Text>
+const ContentVerse = ({ title, content }) => (
+  <View style={styles.contentVerse}>
+    <Text style={styles.contentVerseTitle}>{title}</Text>
+    <Text style={styles.contentVerseText}>{content}</Text>
+  </View>
 );
 
 const Footer = () => (
@@ -57,9 +60,18 @@ export default function SongDisplayScreen({ route, navigation }) {
     setIsLoading(false);
   };
 
-  const renderContentItem = ({ item }) => (
-    <ContentVerse>{item}</ContentVerse>
-  );
+  const renderContentItem = ({ item }) => {
+    const lines = item.split('\n');
+    let title = lines[0];
+    let content = lines.slice(1);
+    if (!title.toLowerCase().includes("verse")) {
+      title = ""
+      content = lines;
+    }
+    return(
+      <ContentVerse title={title} content={content.join('\n')} />
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -88,9 +100,18 @@ const styles = StyleSheet.create({
     paddingRight: 20,
     paddingBottom: 300,
   },
-  contentText: {
-    fontSize: 18,
+  contentVerse: {
     marginBottom: 30,
+  },
+  contentVerseTitle: {
+    fontSize: 14,
+    color: "#777",
+    textTransform: "lowercase",
+    left: -10,
+  },
+  contentVerseText: {
+    fontSize: 18,
+    lineHeight: 25,
   },
 
   footer: {
