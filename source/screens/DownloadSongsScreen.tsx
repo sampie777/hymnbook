@@ -338,7 +338,7 @@ const DownloadSongsScreen: React.FC<ComponentProps> = () => {
                             onPress={onSongBundlePress} />)}
 
         {bundles.length > 0 ? null :
-          <Text style={styles.emptyListText}>{isLoading ? "Loading..." : "No data loaded"}</Text>}
+          <Text style={styles.emptyListText}>{isLoading ? "Loading..." : "No online data available..."}</Text>}
       </ScrollView>
 
       <TouchableHighlight style={styles.deleteAllButton}
@@ -394,7 +394,8 @@ const styles = StyleSheet.create({
   },
 
   emptyListText: {
-    padding: 20
+    padding: 20,
+    textAlign: "center",
   },
 
   deleteAllButton: {

@@ -7,7 +7,7 @@ import LoadingOverlay from "../components/LoadingOverlay";
 
 const ContentVerse = ({ title, content }) => (
   <View style={styles.contentVerse}>
-    <Text style={styles.contentVerseTitle}>{title}</Text>
+    {title === "" ? null : <Text style={styles.contentVerseTitle}>{title}</Text>}
     <Text style={styles.contentVerseText}>{content}</Text>
   </View>
 );
