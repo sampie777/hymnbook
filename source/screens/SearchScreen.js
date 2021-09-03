@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flex: 1,
     alignItems: "center",
-    flexBasis: 200,
+    flexBasis: 185,
     flexGrow: 0,
   },
   infoText: {
@@ -183,6 +183,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "flex-start",
     paddingBottom: 10,
+    paddingTop: 20,
   },
   searchListItem: {
     fontSize: 24,
@@ -195,7 +196,7 @@ const styles = StyleSheet.create({
 
   keyPad: {
     flex: 1,
-    flexBasis: 300,
+    flexBasis: 280,
     flexGrow: 0,
   },
   keyPadRow: {
