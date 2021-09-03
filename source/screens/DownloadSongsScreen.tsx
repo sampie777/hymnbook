@@ -320,7 +320,7 @@ const DownloadSongsScreen: React.FC<ComponentProps> = () => {
                          onPress={() => setProgressResult("")}
                          maxDuration={5000} />
 
-      <Text style={styles.informationText}>Select a bundle to download:</Text>
+      <Text style={styles.informationText}>Select a bundle to download or delete:</Text>
       <ScrollView
         style={styles.listContainer}
         refreshControl={<RefreshControl onRefresh={fetchSongBundles}
