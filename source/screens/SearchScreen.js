@@ -92,7 +92,7 @@ export default function SearchScreen({ navigation }) {
 
     const results = Db.realm().objects(Song.schema.name)
       .sorted("title")
-      .filtered(`title CONTAINS "${query}" LIMIT(${maxResultsLength})`);
+      .filtered(`title LIKE "* ${query}" OR title LIKE "* ${query} *" LIMIT(${maxResultsLength})`);
 
     setSearchResult(results);
   };
