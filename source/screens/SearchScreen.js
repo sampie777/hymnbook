@@ -158,8 +158,9 @@ const styles = StyleSheet.create({
   inputContainer: {
     flex: 1,
     alignItems: "center",
-    flexBasis: 185,
+    flexBasis: "27.5%",
     flexGrow: 0,
+    maxHeight: 200,
   },
   infoText: {
     fontSize: 18,
@@ -196,7 +197,7 @@ const styles = StyleSheet.create({
 
   keyPad: {
     flex: 1,
-    flexBasis: 280,
+    flexBasis: 270,
     flexGrow: 0,
   },
   keyPadRow: {

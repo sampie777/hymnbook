@@ -101,13 +101,14 @@ const styles = StyleSheet.create({
     paddingBottom: 300,
   },
   contentVerse: {
-    marginBottom: 30,
+    marginBottom: 40,
   },
   contentVerseTitle: {
     fontSize: 14,
     color: "#777",
     textTransform: "lowercase",
     left: -10,
+    marginBottom: 7,
   },
   contentVerseText: {
     fontSize: 18,
