@@ -73,7 +73,7 @@ export default function App() {
 
           <Drawer.Screen name={routes.Song} component={SongDisplayScreen}
                          initialParams={{
-                           title: undefined,
+                           id: undefined,
                            query: undefined,
                          }}
                          options={{

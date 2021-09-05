@@ -99,7 +99,7 @@ export default function SearchScreen({ navigation }) {
   };
 
   const onSearchResultItemPress = (song) => {
-    navigation.navigate(routes.Song, { title: song.title, query: inputValue });
+    navigation.navigate(routes.Song, { id: song.id, query: inputValue });
     setInputValue("");
   };
 

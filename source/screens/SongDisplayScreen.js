@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { Button, FlatList, StyleSheet, Text, View } from "react-native";
 import { Song } from "../models/Song";
 import { useFocusEffect } from "@react-navigation/native";
 import Db from "../db";
@@ -42,11 +42,10 @@ export default function SongDisplayScreen({ route, navigation }) {
     React.useCallback(() => {
       onFocus();
       return onBlur;
-    }, [route.params.title]),
+    }, [route.params.id]),
   );
 
   const onFocus = () => {
-    navigation.setOptions({ title: route.params.title });
     setScale(Settings.songScale);
     loadSong();
   };
@@ -62,20 +61,20 @@ export default function SongDisplayScreen({ route, navigation }) {
     }
     setIsLoading(true);
 
-    if (route.params.title === undefined) {
+    if (route.params.id === undefined) {
       setSong(undefined);
       setIsLoading(false);
       return;
     }
 
-    const newSong = Db.songs.realm().objects(Song.schema.name)
-      .find((it) => it.title === route.params.title);
+    const newSong = Db.songs.realm().objectForPrimaryKey(Song.schema.name, route.params.id);
 
     if (newSong === undefined) {
       // Song not found
     }
 
     setSong(newSong);
+    navigation.setOptions({ title: newSong.title });
     setIsLoading(false);
   };
 
@@ -93,45 +92,30 @@ export default function SongDisplayScreen({ route, navigation }) {
   };
 
   const nextSong = () => {
-    let songNumber = route.params.query;
-    if (songNumber === undefined) {
+    if (song === undefined) {
       return;
     }
-
-    const newNumber = +songNumber + 1;
-
-    const newTitle = song.title.replace(+songNumber, newNumber);
-    navigateToSongMatching(newTitle, newNumber);
+    navigateToSongMatching(song.id + 1);
   };
 
   const previousSong = () => {
-    let songNumber = route.params.query;
-    if (songNumber === undefined) {
+    if (song === undefined) {
       return;
     }
-
-    const newNumber = +songNumber - 1;
-    if (newNumber <= 0) {
-      return;
-    }
-
-    const newTitle = song.title.replace(+songNumber, newNumber);
-    navigateToSongMatching(newTitle, newNumber);
+    navigateToSongMatching(song.id - 1);
   };
 
-  const navigateToSongMatching = (newTitle, query) => {
+  const navigateToSongMatching = (id) => {
     setIsLoading(true);
 
-    const results = Db.songs.realm().objects(Song.schema.name)
-      .sorted("title")
-      .filtered(`title = "${newTitle}" LIMIT(1)`);
+    const newSong = Db.songs.realm().objectForPrimaryKey(Song.schema.name, id);
 
-    if (results.length === 0) {
+    if (newSong === undefined) {
       setIsLoading(false);
       return;
     }
 
-    navigation.navigate(routes.Song, { title: results[0].title, query: query });
+    navigation.navigate(routes.Song, { id: id });
   };
 
   const _onPanGestureEvent = () => {
@@ -184,8 +168,7 @@ const styles = StyleSheet.create({
     left: -10,
     marginBottom: 7,
   },
-  contentVerseText: {
-  },
+  contentVerseText: {},
 
   footer: {
     borderTopColor: "#ccc",
