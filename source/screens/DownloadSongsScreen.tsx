@@ -204,15 +204,18 @@ const DownloadSongsScreen: React.FC<ComponentProps> = () => {
       return;
     }
 
+    let songId = Db.songs.getIncrementedPrimaryKey(Song.schema);
     let songs = bundle.songs
-      .map(song => {
-        return new Song({
+      .sort((a, b) => a.id - b.id)
+      .map(song =>
+        new Song({
           title: song.name,
           content: song.verses
             ?.map(verse => verse.name + "\n" + verse.content)
-            .join("\n\n") || ""
-        });
-      });
+            .join("\n\n") || "",
+          id: songId++
+        })
+      );
 
     const songBundle = new LocalSongBundle({
       title: bundle.name,
@@ -395,7 +398,7 @@ const styles = StyleSheet.create({
 
   emptyListText: {
     padding: 20,
-    textAlign: "center",
+    textAlign: "center"
   },
 
   deleteAllButton: {

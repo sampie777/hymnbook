@@ -1,8 +1,11 @@
-import { UUID } from "bson";
+import Db from "../db";
 
 export class Song {
-  constructor({ title, content, id = new UUID() }) {
-    this._id = id;
+  constructor({
+                title, content,
+                id = Db.songs.getIncrementedPrimaryKey(Song.schema),
+              }) {
+    this.id = id;
     this.title = title;
     this.content = content;
   }
@@ -10,17 +13,20 @@ export class Song {
   static schema = {
     name: "Song",
     properties: {
-      _id: "uuid",
+      id: "int",
       title: "string",
       content: "string",
     },
-    primaryKey: "_id",
+    primaryKey: "id",
   };
 }
 
 export class SongBundle {
-  constructor({ title, songs = [], id = new UUID() }) {
-    this._id = id;
+  constructor({
+                title, songs = [],
+                id = Db.songs.getIncrementedPrimaryKey(SongBundle.schema),
+              }) {
+    this.id = id;
     this.title = title;
     this.songs = songs;
   }
@@ -28,10 +34,10 @@ export class SongBundle {
   static schema = {
     name: "SongBundle",
     properties: {
-      _id: "uuid",
+      id: "int",
       title: "string",
       songs: Song.schema.name + "[]",
     },
-    primaryKey: "_id",
+    primaryKey: "id",
   };
 }
