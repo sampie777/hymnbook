@@ -6,13 +6,28 @@ import Db from "../db";
 import LoadingOverlay from "../components/LoadingOverlay";
 import GestureRecognizer from "react-native-swipe-gestures";
 import { routes } from "../navigation";
+import Settings from "../models/Settings";
+import { PinchGestureHandler } from "react-native-gesture-handler";
 
-const ContentVerse = ({ title, content }) => (
-  <View style={styles.contentVerse}>
-    {title === "" ? null : <Text style={styles.contentVerseTitle}>{title}</Text>}
-    <Text style={styles.contentVerseText}>{content}</Text>
-  </View>
-);
+const ContentVerse = ({ title, content, scale }) => {
+  const scalableStyles = StyleSheet.create({
+    contentVerseTitle: {
+      fontSize: 14 * scale,
+    },
+    contentVerseText: {
+      fontSize: Settings.songVerseTextSize * scale,
+      lineHeight: 25 * scale,
+    },
+  });
+
+  return (
+    <View style={styles.contentVerse}>
+      {title === "" ? null :
+        <Text style={[styles.contentVerseTitle, scalableStyles.contentVerseTitle]}>{title}</Text>}
+      <Text style={[styles.contentVerseText, scalableStyles.contentVerseText]}>{content}</Text>
+    </View>
+  );
+};
 
 const Footer = () => (
   <View style={styles.footer} />
@@ -20,6 +35,7 @@ const Footer = () => (
 
 export default function SongDisplayScreen({ route, navigation }) {
   const [song, setSong] = useState(undefined);
+  const [scale, setScale] = useState(Settings.songScale);
   const [isLoading, setIsLoading] = useState(false);
 
   useFocusEffect(
@@ -31,6 +47,7 @@ export default function SongDisplayScreen({ route, navigation }) {
 
   const onFocus = () => {
     navigation.setOptions({ title: route.params.title });
+    setScale(Settings.songScale);
     loadSong();
   };
 
@@ -40,7 +57,7 @@ export default function SongDisplayScreen({ route, navigation }) {
   };
 
   const loadSong = () => {
-    if (!Db.isConnected()) {
+    if (!Db.songs.isConnected()) {
       return;
     }
     setIsLoading(true);
@@ -51,7 +68,7 @@ export default function SongDisplayScreen({ route, navigation }) {
       return;
     }
 
-    const newSong = Db.realm().objects(Song.schema.name)
+    const newSong = Db.songs.realm().objects(Song.schema.name)
       .find((it) => it.title === route.params.title);
 
     if (newSong === undefined) {
@@ -71,7 +88,7 @@ export default function SongDisplayScreen({ route, navigation }) {
       content = lines;
     }
     return (
-      <ContentVerse title={title} content={content.join("\n")} />
+      <ContentVerse title={title} content={content.join("\n")} scale={scale} />
     );
   };
 
@@ -105,7 +122,7 @@ export default function SongDisplayScreen({ route, navigation }) {
   const navigateToSongMatching = (newTitle, query) => {
     setIsLoading(true);
 
-    const results = Db.realm().objects(Song.schema.name)
+    const results = Db.songs.realm().objects(Song.schema.name)
       .sorted("title")
       .filtered(`title = "${newTitle}" LIMIT(1)`);
 
@@ -117,24 +134,30 @@ export default function SongDisplayScreen({ route, navigation }) {
     navigation.navigate(routes.Song, { title: results[0].title, query: query });
   };
 
-  return (
-    <GestureRecognizer
-      onSwipeLeft={nextSong}
-      onSwipeRight={previousSong}
-      config={{
-        velocityThreshold: 0.7,
-        directionalOffsetThreshold: 80,
-        gestureIsClickThreshold: 5,
-      }}
-      style={styles.container}>
-      <FlatList
-        data={song ? song.content.split("\n\n") : []}
-        renderItem={renderContentItem}
-        contentContainerStyle={styles.contentSectionList}
-        ListFooterComponent={<Footer />} />
+  const _onPanGestureEvent = () => {
 
-      <LoadingOverlay text={null} isVisible={isLoading} />
-    </GestureRecognizer>
+  };
+
+  const _onPinchHandlerStateChange = (event) => {
+    setScale(scale * event.nativeEvent.scale);
+    Settings.songScale = scale;
+  };
+
+  return (
+    <PinchGestureHandler
+      onGestureEvent={_onPanGestureEvent}
+      onHandlerStateChange={_onPinchHandlerStateChange}
+      style={styles.container}>
+      <View>
+        <FlatList
+          data={song ? song.content.split("\n\n") : []}
+          renderItem={renderContentItem}
+          contentContainerStyle={styles.contentSectionList}
+          ListFooterComponent={<Footer />} />
+
+        <LoadingOverlay text={null} isVisible={isLoading} />
+      </View>
+    </PinchGestureHandler>
   );
 }
 
@@ -156,15 +179,12 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   contentVerseTitle: {
-    fontSize: 14,
     color: "#777",
     textTransform: "lowercase",
     left: -10,
     marginBottom: 7,
   },
   contentVerseText: {
-    fontSize: 18,
-    lineHeight: 25,
   },
 
   footer: {

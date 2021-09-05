@@ -92,12 +92,12 @@ const DownloadSongsScreen: React.FC<ComponentProps> = () => {
   };
 
   const loadLocalSongBundles = () => {
-    if (!Db.isConnected()) {
+    if (!Db.songs.isConnected()) {
       return;
     }
     setIsLoading(true);
 
-    const bundles = Db.realm()
+    const bundles = Db.songs.realm()
       .objects<LocalSongBundle>(LocalSongBundle.schema.name)
       .map(it => it as unknown as LocalSongBundle);
     setLocalBundles(bundles);
@@ -185,7 +185,7 @@ const DownloadSongsScreen: React.FC<ComponentProps> = () => {
   };
 
   const saveSongBundle = (bundle: SongBundle) => {
-    if (!Db.isConnected()) {
+    if (!Db.songs.isConnected()) {
       console.log("Database is not connected");
       return;
     }
@@ -197,7 +197,7 @@ const DownloadSongsScreen: React.FC<ComponentProps> = () => {
 
     setIsLoading(true);
 
-    const existingBundle = Db.realm().objects(LocalSongBundle.schema.name).filtered(`title = "${bundle.name}"`);
+    const existingBundle = Db.songs.realm().objects(LocalSongBundle.schema.name).filtered(`title = "${bundle.name}"`);
     if (existingBundle.length > 0) {
       Alert.alert("Error", `Bundle ${bundle.name} already exists`);
       setIsLoading(false);
@@ -221,8 +221,8 @@ const DownloadSongsScreen: React.FC<ComponentProps> = () => {
 
     console.log("Saving to database.");
     try {
-      Db.realm().write(() => {
-        Db.realm().create(LocalSongBundle.schema.name, songBundle);
+      Db.songs.realm().write(() => {
+        Db.songs.realm().create(LocalSongBundle.schema.name, songBundle);
       });
     } catch (e) {
       console.error(e);
@@ -254,12 +254,12 @@ const DownloadSongsScreen: React.FC<ComponentProps> = () => {
     const songCount = bundle.songs.length;
     const bundleTitle = bundle.title;
 
-    Db.realm().write(() => {
+    Db.songs.realm().write(() => {
       console.log("Deleting songs for song bundle: " + bundle.title);
-      Db.realm().delete(bundle.songs);
+      Db.songs.realm().delete(bundle.songs);
 
       console.log("Deleting song bundle: " + bundle.title);
-      Db.realm().delete(bundle);
+      Db.songs.realm().delete(bundle);
     });
 
     setIsLoading(false);
@@ -274,17 +274,17 @@ const DownloadSongsScreen: React.FC<ComponentProps> = () => {
   const onConfirmDeleteAll = () => {
     setRequestDeleteAll(false);
 
-    if (!Db.isConnected()) {
+    if (!Db.songs.isConnected()) {
       console.log("Database is not connected");
       return;
     }
     setIsLoading(true);
 
     console.log("Deleting database");
-    Db.deleteDb();
+    Db.songs.deleteDb();
 
     setLocalBundles([]);
-    Db.connect()
+    Db.songs.connect()
       .catch(e => {
         console.error("Could not connect to local database", e);
         Alert.alert("Success", "Could not connect to local database: " + e);

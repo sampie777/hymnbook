@@ -1,5 +1,6 @@
+import Settings from "./models/Settings";
 
-const apiHostUrl = "http://192.168.0.148:8080"
+const apiHostUrl = Settings.songBundlesApiUrl
 const apiBaseUrl = `${apiHostUrl}/api/v1`;
 
 const get = (url: string) => fetch(url, {
@@ -68,7 +69,7 @@ export const api = {
         getWithSongs: (id: number, loadVerses?: boolean) =>
             get(`${apiBaseUrl}/songs/bundles/${id}?loadSongs=true&loadVerses=${loadVerses ? "true" : "false"}`),
         search: (query: string, page = 0, page_size = 50,
-                 fieldLanguages: Array<String> = [],
+                 fieldLanguages: Array<string> = [],
                  loadSongs = false, loadVerses = false) =>
             get(`${apiBaseUrl}/songs/bundles?query=${query}&page=${page}&page_size=${page_size}` +
                 `&fieldLanguages=${fieldLanguages.join(",")}` +

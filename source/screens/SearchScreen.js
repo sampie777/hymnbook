@@ -5,6 +5,7 @@ import { Song } from "../models/Song";
 import { routes } from "../navigation";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useFocusEffect } from "@react-navigation/native";
+import Settings from "../models/Settings";
 
 const Key = ({ children, onPress, extraStyle }) => {
   const keyTextStyle = [styles.keyText];
@@ -36,8 +37,8 @@ export default function SearchScreen({ navigation }) {
   const [inputValue, setInputValue] = useState("");
   const [results, setSearchResult] = useState([]);
 
-  const maxInputLength = 3;
-  const maxResultsLength = 40;
+  const maxInputLength = Settings.maxSearchInputLength;
+  const maxResultsLength = Settings.maxSearchResultsLength;
 
   useFocusEffect(
     React.useCallback(() => {
@@ -55,7 +56,7 @@ export default function SearchScreen({ navigation }) {
 
   useEffect(() => {
     fetchSearchResults();
-    return () => null;
+    return () => undefined;
   }, [inputValue]);
 
   const onNumberKeyPress = (number) => {
@@ -80,7 +81,7 @@ export default function SearchScreen({ navigation }) {
   };
 
   const fetchSearchResults = () => {
-    if (!Db.isConnected()) {
+    if (!Db.songs.isConnected()) {
       return;
     }
     const query = inputValue;
@@ -90,7 +91,7 @@ export default function SearchScreen({ navigation }) {
       return;
     }
 
-    const results = Db.realm().objects(Song.schema.name)
+    const results = Db.songs.realm().objects(Song.schema.name)
       .sorted("title")
       .filtered(`title LIKE "* ${query}" OR title LIKE "* ${query} *" LIMIT(${maxResultsLength})`);
 

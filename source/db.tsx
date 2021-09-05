@@ -1,20 +1,23 @@
-import Realm from "realm";
+import Realm, { ObjectClass, ObjectSchema } from "realm";
 import { Song, SongBundle } from "./models/Song";
+import { Setting } from "./models/Settings";
+
+interface DatabaseProps {
+  path: string;
+  schemas: Array<ObjectClass | ObjectSchema>;
+  schemaVersion: number;
+}
 
 class Database {
-  _realm: Realm | null = null;
-  path = "hymnbook_songs";
-  schemas = [Song.schema, SongBundle.schema];
-  _isConnected = false;
-  schemaVersion = 1;
-
   config: Realm.Configuration;
+  _realm: Realm | null = null;
+  _isConnected = false;
 
-  constructor() {
+  constructor(props: DatabaseProps) {
     this.config = {
-      path: this.path,
-      schema: this.schemas,
-      schemaVersion: this.schemaVersion,
+      path: props.path,
+      schema: props.schemas,
+      schemaVersion: props.schemaVersion
     };
   }
 
@@ -54,7 +57,7 @@ class Database {
       throw Error("Cannot use realm: realm is null");
     }
     return this._realm;
-  }
+  };
 
   deleteDb() {
     if (this.isConnected()) {
@@ -66,6 +69,17 @@ class Database {
   }
 }
 
-const Db = new Database();
+const Db = {
+  songs: new Database({
+    path: "hymnbook_songs",
+    schemas: [Song.schema, SongBundle.schema],
+    schemaVersion: 1
+  }),
+  settings: new Database({
+    path: "hymnbook_settings",
+    schemas: [Setting.schema],
+    schemaVersion: 1
+  })
+};
 
 export default Db;

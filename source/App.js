@@ -14,10 +14,11 @@ import { routes } from "./navigation";
 import SearchScreen from "./screens/SearchScreen";
 import SongDisplayScreen from "./screens/SongDisplayScreen";
 import Db from "./db";
-import { Song } from "./models/Song";
 import CustomDrawerContent from "./components/CustomDrawerContent";
 import Icon from "react-native-vector-icons/FontAwesome";
 import DownloadSongsScreen from "./screens/DownloadSongsScreen";
+import Settings from "./models/Settings";
+import SettingsScreen from "./screens/SettingsScreen";
 
 const Drawer = createDrawerNavigator();
 
@@ -27,34 +28,26 @@ export default function App() {
     return onExit;
   }, []);
 
-  const fillDatabaseWithMockValues = () => {
-    Db.realm().write(() => {
-      Db.realm().create(Song.schema.name, new Song({ title: "Psalm 1", content: "Yolo" }));
-      Db.realm().create(Song.schema.name, new Song({ title: "Psalm 2", content: "Yolo" }));
-      Db.realm().create(Song.schema.name, new Song({ title: "Psalm 3", content: "Yolo" }));
-      Db.realm().create(Song.schema.name, new Song({ title: "Psalm 004", content: "Yolo" }));
-      Db.realm().create(Song.schema.name, new Song({ title: "Psalm 100", content: "Yolo" }));
-      Db.realm().create(Song.schema.name, new Song({ title: "Psalm 101", content: "Yolo" }));
-      Db.realm().create(Song.schema.name, new Song({ title: "Psalm 102", content: "Yolo" }));
-      Db.realm().create(Song.schema.name, new Song({ title: "Psalm 111", content: "Yolo" }));
-      Db.realm().create(Song.schema.name, new Song({ title: "Psalm 150", content: "Yolo" }));
-    });
-
-    console.log("Songs: " + Db.realm().objects(Song.schema.name).map((it) => `${it._id} ${it.title}`));
-  };
-
   const onLaunch = () => {
-    Db.connect()
-      // .then(fillDatabaseWithMockValues)
+    Db.settings.connect()
       .catch(e => {
-        console.error("Could not connect to local database", e);
-        alert("Could not connect to local database: " + e);
+        console.error("Could not connect to local settings database", e);
+        alert("Could not connect to local settings database: " + e);
       });
 
+    Db.songs.connect()
+      .catch(e => {
+        console.error("Could not connect to local song database", e);
+        alert("Could not connect to local song database: " + e);
+      });
+
+    Settings.load();
   };
 
   const onExit = () => {
-    Db.disconnect();
+    Settings.store();
+    Db.songs.disconnect();
+    Db.settings.disconnect();
   };
 
   return (
@@ -72,6 +65,12 @@ export default function App() {
                            drawerIcon: ({ focused, color, size }) =>
                              <Icon name="database" size={size} color={color} />,
                          }} />
+          <Drawer.Screen name={routes.Settings} component={SettingsScreen}
+                         options={{
+                           drawerIcon: ({ focused, color, size }) =>
+                             <Icon name="cogs" size={size} color={color} />,
+                         }} />
+
           <Drawer.Screen name={routes.Song} component={SongDisplayScreen}
                          initialParams={{
                            title: undefined,
