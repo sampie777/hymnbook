@@ -10,12 +10,13 @@ import {
   View
 } from "react-native";
 import { api, throwErrorsIfNotOk } from "../api";
-import { SongBundle } from "../models/SongBundle";
+import { SongBundle } from "../models/ServerSongsModel";
 import Db from "../db";
-import { Song, SongBundle as LocalSongBundle } from "../models/Song";
+import { Song, SongBundle as LocalSongBundle, Verse } from "../models/Song";
 import DisposableMessage from "../components/DisposableMessage";
 import ConfirmationModal from "../components/ConfirmationModal";
 import Icon from "react-native-vector-icons/FontAwesome5";
+import { dateFrom } from "../utils";
 
 interface SongBundleItemComponentProps {
   bundle: SongBundle;
@@ -54,7 +55,7 @@ const LocalSongBundleItem: React.FC<LocalSongBundleItemComponentProps>
     <TouchableOpacity onPress={() => onPress(bundle)}
                       style={styles.songBundleItemContainer}>
       <Text style={styles.songBundleItemText}>
-        {bundle.title}
+        {bundle.name}
       </Text>
       <Text style={styles.songBundleItemInfoText}>
         {bundle.songs.length} songs
@@ -197,7 +198,8 @@ const DownloadSongsScreen: React.FC<ComponentProps> = () => {
 
     setIsLoading(true);
 
-    const existingBundle = Db.songs.realm().objects(LocalSongBundle.schema.name).filtered(`title = "${bundle.name}"`);
+    const existingBundle = Db.songs.realm().objects(LocalSongBundle.schema.name)
+      .filtered(`name = "${bundle.name}"`);
     if (existingBundle.length > 0) {
       Alert.alert("Error", `Bundle ${bundle.name} already exists`);
       setIsLoading(false);
@@ -205,22 +207,37 @@ const DownloadSongsScreen: React.FC<ComponentProps> = () => {
     }
 
     let songId = Db.songs.getIncrementedPrimaryKey(Song.schema);
+    let verseId = Db.songs.getIncrementedPrimaryKey(Verse.schema);
     let songs = bundle.songs
       .sort((a, b) => a.id - b.id)
       .map(song =>
-        new Song({
-          title: song.name,
-          content: song.verses
-            ?.map(verse => verse.name + "\n" + verse.content)
-            .join("\n\n") || "",
-          id: songId++
-        })
+        new Song(
+          song.name,
+          song.author,
+          song.copyright,
+          song.language,
+          dateFrom(song.createdAt),
+          dateFrom(song.modifiedAt),
+          song.verses
+            ?.map(verse => new Verse(
+              verse.index,
+              verse.name,
+              verse.content,
+              verse.language,
+              verseId++,
+            )),
+          songId++
+        )
       );
 
-    const songBundle = new LocalSongBundle({
-      title: bundle.name,
-      songs: songs
-    });
+    const songBundle = new LocalSongBundle(
+      bundle.abbreviation,
+      bundle.name,
+      bundle.language,
+      dateFrom(bundle.createdAt),
+      dateFrom(bundle.modifiedAt),
+      songs
+    );
 
     console.log("Saving to database.");
     try {
@@ -255,23 +272,23 @@ const DownloadSongsScreen: React.FC<ComponentProps> = () => {
     setIsLoading(true);
 
     const songCount = bundle.songs.length;
-    const bundleTitle = bundle.title;
+    const bundleName = bundle.name;
 
     Db.songs.realm().write(() => {
-      console.log("Deleting songs for song bundle: " + bundle.title);
+      console.log("Deleting songs for song bundle: " + bundle.name);
       Db.songs.realm().delete(bundle.songs);
 
-      console.log("Deleting song bundle: " + bundle.title);
+      console.log("Deleting song bundle: " + bundle.name);
       Db.songs.realm().delete(bundle);
     });
 
     setIsLoading(false);
-    Alert.alert("Success", `Deleted all ${songCount} songs for ${bundleTitle}`);
+    Alert.alert("Success", `Deleted all ${songCount} songs for ${bundleName}`);
     loadLocalSongBundles();
   };
 
   const isBundleLocal = (bundle: SongBundle) => {
-    return localBundles.some(it => it.title == bundle.name);
+    return localBundles.some(it => it.name == bundle.name);
   };
 
   const onConfirmDeleteAll = () => {
@@ -310,7 +327,7 @@ const DownloadSongsScreen: React.FC<ComponentProps> = () => {
       <ConfirmationModal isOpen={requestDeleteForBundle !== undefined}
                          onClose={() => setRequestDeleteForBundle(undefined)}
                          onConfirm={onConfirmDeleteSongBundle}>
-        <Text>Delete all songs for {requestDeleteForBundle?.title}?</Text>
+        <Text>Delete all songs for {requestDeleteForBundle?.name}?</Text>
       </ConfirmationModal>
 
       <ConfirmationModal isOpen={requestDeleteAll}
@@ -330,7 +347,7 @@ const DownloadSongsScreen: React.FC<ComponentProps> = () => {
                                         refreshing={isLoading} />}>
 
         {localBundles.map((bundle: LocalSongBundle) =>
-          <LocalSongBundleItem key={bundle.title}
+          <LocalSongBundleItem key={bundle.name}
                                bundle={bundle}
                                onPress={onLocalSongBundlePress} />)}
 
