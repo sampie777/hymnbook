@@ -11,20 +11,27 @@ export class Result {
   success: boolean;
   message?: string;
   error?: Error;
+  data?: any;
 
-  constructor(success: boolean,
-              message?: string,
-              error?: Error) {
+  constructor({ success, message, error, data }:
+                {
+                  success: boolean,
+                  message?: string,
+                  error?: Error,
+                  data?: any,
+                }) {
     this.success = success;
     this.message = message;
     this.error = error;
+    this.data = data;
   }
 
   alert() {
-    Alert.alert(
-      this.success ? "Success" : "Error",
-      this.message || this.error?.toString() || ""
-    );
+    const message = this.message || this.error?.toString();
+    if (message === undefined) {
+      return;
+    }
+    Alert.alert((this.success ? "Success" : "Error"), message);
   }
 
   throwIfException() {

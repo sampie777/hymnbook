@@ -9,14 +9,13 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import { api, throwErrorsIfNotOk } from "../api";
 import { SongBundle } from "../models/ServerSongsModel";
-import Db from "../scripts/db";
-import { Song, SongBundle as LocalSongBundle, Verse } from "../models/Songs";
+import { SongBundle as LocalSongBundle } from "../models/Songs";
 import DisposableMessage from "../components/DisposableMessage";
 import ConfirmationModal from "../components/ConfirmationModal";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import { SongProcessor } from "../scripts/songProcessor";
+import { Server } from "../scripts/server";
 
 interface SongBundleItemComponentProps {
   bundle: SongBundle;
@@ -93,38 +92,22 @@ const DownloadSongsScreen: React.FC<ComponentProps> = () => {
   };
 
   const loadLocalSongBundles = () => {
-    if (!Db.songs.isConnected()) {
-      return;
-    }
     setIsLoading(true);
 
-    const bundles = Db.songs.realm()
-      .objects<LocalSongBundle>(LocalSongBundle.schema.name)
-      .map(it => it as unknown as LocalSongBundle);
-    setLocalBundles(bundles);
+    const result = SongProcessor.loadLocalSongBundles();
+    result.alert();
+    result.throwIfException();
 
+    setLocalBundles(result.data);
     setIsLoading(false);
   };
 
   const fetchSongBundles = () => {
     setIsLoading(true);
-    api.songBundles.list()
-      .then(throwErrorsIfNotOk)
-      .then(response => response.json())
-      .then(data => {
-        if (data.status === "error") {
-          throw new Error(data.data);
-        }
-
-        setBundles(data.content);
-      })
-      .catch(error => {
-        console.error(`Error fetching song bundles`, error);
-        Alert.alert("Error", `Error fetching song bundles: ${error}`);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    Server.fetchSongBundles()
+      .then(result => setBundles(result.data))
+      .catch(error => Alert.alert("Error", `Error fetching song bundles: ${error}`))
+      .finally(() => setIsLoading(false));
   };
 
   const onSongBundlePress = (bundle: SongBundle) => {
@@ -163,26 +146,13 @@ const DownloadSongsScreen: React.FC<ComponentProps> = () => {
   };
 
   const downloadSongBundle = (bundle: SongBundle) => {
-    console.log("Downloading song bundle: " + bundle.name);
     setIsLoading(true);
 
-    api.songBundles.getWithSongs(bundle.id, true)
-      .then(throwErrorsIfNotOk)
-      .then(response => response.json())
-      .then(data => {
-        if (data.status === "error") {
-          throw new Error(data.data);
-        }
-
-        saveSongBundle(data.content);
-      })
-      .catch(error => {
-        console.error(`Error fetching songs for song bundle ${bundle.name}`, error);
-        Alert.alert("Error", `Error fetching songs for song bundle ${bundle.name}: ${error}`);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    Server.fetchSongBundleWithSongsAndVerses(bundle)
+      .then(result => saveSongBundle(result.data))
+      .catch(error =>
+        Alert.alert("Error", `Error fetching songs for song bundle ${bundle.name}: ${error}`))
+      .finally(() => setIsLoading(false));
   };
 
   const saveSongBundle = (bundle: SongBundle) => {

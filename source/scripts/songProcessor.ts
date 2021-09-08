@@ -4,22 +4,36 @@ import { Song, SongBundle, Verse } from "../models/Songs";
 import { dateFrom, Result } from "./utils";
 
 export namespace SongProcessor {
+
+  export const loadLocalSongBundles = (): Result => {
+    if (!Db.songs.isConnected()) {
+      console.log("Database is not connected");
+      return new Result({ success: false, message: "Database is not connected" });
+    }
+
+    const bundles = Db.songs.realm()
+      .objects<SongBundle>(SongBundle.schema.name)
+      .map(it => it as unknown as SongBundle);
+
+    return new Result({ success: true, data: bundles });
+  };
+
   export const saveSongBundleToDatabase = (bundle: BackendSongBundle): Result => {
     if (!Db.songs.isConnected()) {
       console.log("Database is not connected");
-      return new Result(false, "Database is not connected");
+      return new Result({ success: false, message: "Database is not connected" });
     }
 
     if (bundle.songs == null) {
       console.warn("Song bundle contains no songs");
-      return new Result(false, "Song bundle contains no songs");
+      return new Result({ success: false, message: "Song bundle contains no songs" });
     }
 
     const existingBundle = Db.songs.realm()
       .objects(SongBundle.schema.name)
       .filtered(`name = "${bundle.name}"`);
     if (existingBundle.length > 0) {
-      return new Result(false, `Bundle ${bundle.name} already exists`);
+      return new Result({ success: false, message: `Bundle ${bundle.name} already exists` });
     }
 
     let songId = Db.songs.getIncrementedPrimaryKey(Song.schema);
@@ -62,17 +76,17 @@ export namespace SongProcessor {
       });
     } catch (e) {
       console.error(e);
-      return new Result(false, `Failed to import songs: ${e}`, e as Error);
+      return new Result({ success: false, message: `Failed to import songs: ${e}`, error: e as Error });
     }
 
     console.log(`Created ${songs.length} songs`);
-    return new Result(true, `${songs.length} songs added!`);
+    return new Result({ success: true, message: `${songs.length} songs added!` });
   };
 
   export const deleteSongDatabase = (): Result => {
     if (!Db.songs.isConnected()) {
       console.log("Database is not connected");
-      return new Result(false, "Database is not connected");
+      return new Result({ success: false, message: "Database is not connected" });
     }
 
     console.log("Deleting database");
@@ -81,16 +95,16 @@ export namespace SongProcessor {
     Db.songs.connect()
       .catch(e => {
         console.error("Could not connect to local database after deletions", e);
-        return new Result(false, "Could not reconnect to local database after deletions: " + e);
+        return new Result({ success: false, message: "Could not reconnect to local database after deletions: " + e });
       });
 
-    return new Result(true, "Deleted all songs");
+    return new Result({ success: true, message: "Deleted all songs" });
   };
 
   export const deleteSongBundle = (bundle: SongBundle): Result => {
     if (!Db.songs.isConnected()) {
       console.log("Database is not connected");
-      return new Result(false, "Database is not connected");
+      return new Result({ success: false, message: "Database is not connected" });
     }
 
     const songCount = bundle.songs.length;
@@ -104,6 +118,6 @@ export namespace SongProcessor {
       Db.songs.realm().delete(bundle);
     });
 
-    return new Result(true, `Deleted all ${songCount} songs for ${bundleName}`);
+    return new Result({ success: true, message: `Deleted all ${songCount} songs for ${bundleName}` });
   };
 }
