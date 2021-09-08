@@ -13,11 +13,11 @@ import { NavigationContainer, useFocusEffect } from "@react-navigation/native";
 import { routes } from "./navigation";
 import SearchScreen from "./screens/SearchScreen";
 import SongDisplayScreen from "./screens/SongDisplayScreen";
-import Db from "./db";
+import Db from "./scripts/db";
 import CustomDrawerContent from "./components/CustomDrawerContent";
 import Icon from "react-native-vector-icons/FontAwesome";
 import DownloadSongsScreen from "./screens/DownloadSongsScreen";
-import Settings from "./models/Settings";
+import Settings from "./scripts/settings";
 import SettingsScreen from "./screens/SettingsScreen";
 
 const Drawer = createDrawerNavigator();

@@ -1,6 +1,6 @@
 import React, { Component, useEffect } from "react";
 import { RefreshControl, ScrollView, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from "react-native";
-import Settings from "../models/Settings";
+import Settings from "../scripts/settings";
 
 interface SettingProps {
   name: string;

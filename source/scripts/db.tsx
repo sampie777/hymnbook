@@ -1,6 +1,6 @@
 import Realm, { ObjectClass, ObjectSchema } from "realm";
-import { Song, SongBundle, Verse } from "./models/Song";
-import { Setting } from "./models/Settings";
+import { Song, SongBundle, Verse } from "../models/Songs";
+import { Setting } from "../models/Settings";
 
 interface DatabaseProps {
   path: string;

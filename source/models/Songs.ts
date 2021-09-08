@@ -1,4 +1,4 @@
-import Db from "../db";
+import Db from "../scripts/db";
 
 export class Verse {
   id: number;

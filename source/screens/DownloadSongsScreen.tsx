@@ -11,12 +11,12 @@ import {
 } from "react-native";
 import { api, throwErrorsIfNotOk } from "../api";
 import { SongBundle } from "../models/ServerSongsModel";
-import Db from "../db";
-import { Song, SongBundle as LocalSongBundle, Verse } from "../models/Song";
+import Db from "../scripts/db";
+import { Song, SongBundle as LocalSongBundle, Verse } from "../models/Songs";
 import DisposableMessage from "../components/DisposableMessage";
 import ConfirmationModal from "../components/ConfirmationModal";
 import Icon from "react-native-vector-icons/FontAwesome5";
-import { dateFrom } from "../utils";
+import { SongProcessor } from "../scripts/songProcessor";
 
 interface SongBundleItemComponentProps {
   bundle: SongBundle;
@@ -186,74 +186,13 @@ const DownloadSongsScreen: React.FC<ComponentProps> = () => {
   };
 
   const saveSongBundle = (bundle: SongBundle) => {
-    if (!Db.songs.isConnected()) {
-      console.log("Database is not connected");
-      return;
-    }
-
-    if (bundle.songs == null) {
-      console.warn("Song bundle contains no songs");
-      return;
-    }
-
     setIsLoading(true);
 
-    const existingBundle = Db.songs.realm().objects(LocalSongBundle.schema.name)
-      .filtered(`name = "${bundle.name}"`);
-    if (existingBundle.length > 0) {
-      Alert.alert("Error", `Bundle ${bundle.name} already exists`);
-      setIsLoading(false);
-      return;
-    }
+    const result = SongProcessor.saveSongBundleToDatabase(bundle);
+    result.alert();
+    result.throwIfException();
 
-    let songId = Db.songs.getIncrementedPrimaryKey(Song.schema);
-    let verseId = Db.songs.getIncrementedPrimaryKey(Verse.schema);
-    let songs = bundle.songs
-      .sort((a, b) => a.id - b.id)
-      .map(song =>
-        new Song(
-          song.name,
-          song.author,
-          song.copyright,
-          song.language,
-          dateFrom(song.createdAt),
-          dateFrom(song.modifiedAt),
-          song.verses
-            ?.map(verse => new Verse(
-              verse.index,
-              verse.name,
-              verse.content,
-              verse.language,
-              verseId++,
-            )),
-          songId++
-        )
-      );
-
-    const songBundle = new LocalSongBundle(
-      bundle.abbreviation,
-      bundle.name,
-      bundle.language,
-      dateFrom(bundle.createdAt),
-      dateFrom(bundle.modifiedAt),
-      songs
-    );
-
-    console.log("Saving to database.");
-    try {
-      Db.songs.realm().write(() => {
-        Db.songs.realm().create(LocalSongBundle.schema.name, songBundle);
-      });
-    } catch (e) {
-      console.error(e);
-      setIsLoading(false);
-      Alert.alert("Error", `Failed to import songs: ${e}`);
-      throw e;
-    }
-
-    console.log(`Created ${songs.length} songs`);
     setIsLoading(false);
-    Alert.alert("Success", `${songs.length} songs added!`);
     loadLocalSongBundles();
   };
 
@@ -271,19 +210,11 @@ const DownloadSongsScreen: React.FC<ComponentProps> = () => {
   const deleteSongBundle = (bundle: LocalSongBundle) => {
     setIsLoading(true);
 
-    const songCount = bundle.songs.length;
-    const bundleName = bundle.name;
-
-    Db.songs.realm().write(() => {
-      console.log("Deleting songs for song bundle: " + bundle.name);
-      Db.songs.realm().delete(bundle.songs);
-
-      console.log("Deleting song bundle: " + bundle.name);
-      Db.songs.realm().delete(bundle);
-    });
+    const result = SongProcessor.deleteSongBundle(bundle);
+    result.alert();
+    result.throwIfException();
 
     setIsLoading(false);
-    Alert.alert("Success", `Deleted all ${songCount} songs for ${bundleName}`);
     loadLocalSongBundles();
   };
 
@@ -293,26 +224,14 @@ const DownloadSongsScreen: React.FC<ComponentProps> = () => {
 
   const onConfirmDeleteAll = () => {
     setRequestDeleteAll(false);
-
-    if (!Db.songs.isConnected()) {
-      console.log("Database is not connected");
-      return;
-    }
     setIsLoading(true);
-
-    console.log("Deleting database");
-    Db.songs.deleteDb();
-
     setLocalBundles([]);
-    Db.songs.connect()
-      .catch(e => {
-        console.error("Could not connect to local database", e);
-        Alert.alert("Success", "Could not connect to local database: " + e);
-      });
 
+    const result = SongProcessor.deleteSongDatabase();
+    result.alert();
+    result.throwIfException();
 
     setIsLoading(false);
-    Alert.alert("Success", "Deleted all songs");
     loadLocalSongBundles();
   };
 

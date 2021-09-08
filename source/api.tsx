@@ -1,4 +1,4 @@
-import Settings from "./models/Settings";
+import Settings from "./scripts/settings";
 
 const apiHostUrl = Settings.songBundlesApiUrl
 const apiBaseUrl = `${apiHostUrl}/api/v1`;

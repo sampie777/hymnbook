@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import Db from "../db";
-import { Song } from "../models/Song";
+import Db from "../scripts/db";
+import { Song } from "../models/Songs";
 import { routes } from "../navigation";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useFocusEffect } from "@react-navigation/native";
-import Settings from "../models/Settings";
+import Settings from "../scripts/settings";
 
 interface KeyProps {
   onPress: () => void;
