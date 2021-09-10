@@ -1,5 +1,6 @@
 import { Setting } from "../models/Settings";
 import Db from "./db";
+import { AccessRequestStatus } from "./server/auth";
 
 class SettingsProvider {
   static set(key: string, value: string) {
@@ -20,14 +21,21 @@ class SettingsProvider {
     return this.set(key, stringValue);
   }
 
+  static setBoolean(key: string, value: boolean) {
+    const stringValue = value.toString();
+    return this.set(key, stringValue);
+  }
+
   static get(key: string): string | undefined {
     if (!Db.settings.isConnected()) {
-      return undefined;
+      // @ts-ignore
+      return Settings[key];
     }
 
     const value = Db.settings.realm().objects(Setting.schema.name).filtered(`key = "${key}"`);
     if (value === null || value === undefined) {
-      return undefined;
+      // @ts-ignore
+      return Settings[key];
     }
     return (value[0] as unknown as Setting).value;
   }
@@ -35,10 +43,21 @@ class SettingsProvider {
   static getNumber(key: string): number | undefined {
     const stringValue = this.get(key);
     if (stringValue === undefined) {
-      return undefined;
+      // @ts-ignore
+      return Settings[key];
     }
 
     return +stringValue;
+  }
+
+  static getBoolean(key: string): boolean | undefined {
+    const stringValue = this.get(key);
+    if (stringValue === undefined) {
+      // @ts-ignore
+      return Settings[key];
+    }
+
+    return stringValue.toString() == "true";
   }
 }
 
@@ -50,6 +69,13 @@ class SettingsClass {
 
   songScale = 1.0;
   songVerseTextSize = 18;
+
+  // Server authentication
+  useAuthentication = true;
+  authRequestId = "";
+  authJwt = "";
+  authStatus = AccessRequestStatus.UNKNOWN;
+  authDeniedReason = "";
 
   load() {
     console.log("Loading settings");
@@ -68,8 +94,10 @@ class SettingsClass {
         return SettingsProvider.get(key);
       case "number":
         return SettingsProvider.getNumber(key);
+      case "boolean":
+        return SettingsProvider.getBoolean(key);
       default:
-        console.error("No matching get function found for type of key: " + key);
+        console.error("No matching get function found for loading type of key: " + key + " of type: " + typeof value);
     }
   }
 
@@ -81,8 +109,10 @@ class SettingsClass {
           return SettingsProvider.set(key, value);
         case "number":
           return SettingsProvider.setNumber(key, value);
+        case "boolean":
+          return SettingsProvider.setBoolean(key, value);
         default:
-          console.error("No matching set function found for type of key: " + key);
+          console.error("No matching set function found for storing type of key: " + key + " of type: " + typeof value);
       }
     });
   }

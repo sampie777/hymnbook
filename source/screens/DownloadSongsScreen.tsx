@@ -15,7 +15,7 @@ import DisposableMessage from "../components/DisposableMessage";
 import ConfirmationModal from "../components/ConfirmationModal";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import { SongProcessor } from "../scripts/songProcessor";
-import { Server } from "../scripts/server";
+import { Server } from "../scripts/server/server";
 
 interface SongBundleItemComponentProps {
   bundle: SongBundle;

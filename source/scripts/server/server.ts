@@ -1,6 +1,6 @@
-import { api, throwErrorsIfNotOk } from "../api";
-import { Result } from "./utils";
-import { SongBundle } from "../models/ServerSongsModel";
+import { api, throwErrorsIfNotOk } from "../../api";
+import { Result } from "../utils";
+import { SongBundle } from "../../models/ServerSongsModel";
 
 export namespace Server {
   export const fetchSongBundles = (): Promise<Result> => {
