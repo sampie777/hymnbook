@@ -1,5 +1,6 @@
 import Settings from "../settings";
 import { api, throwErrorsIfNotOk } from "../../api";
+import { getUniqueId } from "react-native-device-info";
 
 export enum AccessRequestStatus {
   UNKNOWN = "UNKNOWN",
@@ -153,6 +154,11 @@ export class ServerAuth {
   }
 
   static _getDeviceId(): string {
-    return "myappp1"; // todo: get device ID
+    if (Settings.authClientName === "") {
+      Settings.authClientName = getUniqueId();
+      Settings.store();
+    }
+
+    return Settings.authClientName;
   }
 }

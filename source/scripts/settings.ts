@@ -72,6 +72,7 @@ class SettingsClass {
 
   // Server authentication
   useAuthentication = true;
+  authClientName = "";
   authRequestId = "";
   authJwt = "";
   authStatus = AccessRequestStatus.UNKNOWN;

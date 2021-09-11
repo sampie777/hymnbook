@@ -88,7 +88,7 @@ const SettingsScreen: React.FC<ComponentProps> = () => {
 
   function getAuthenticationStateAsMessage() {
     if (ServerAuth.isAuthenticated()) {
-      return "Approved";
+      return "Approved as " + Settings.authClientName;
     } else if (Settings.authStatus === AccessRequestStatus.DENIED) {
       return "Denied: " + Settings.authDeniedReason;
     } else if (Settings.authStatus === AccessRequestStatus.REQUESTED) {

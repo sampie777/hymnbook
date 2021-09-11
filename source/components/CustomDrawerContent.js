@@ -4,9 +4,9 @@ import {
 } from "@react-navigation/drawer";
 import { CommonActions, DrawerActions, useLinkBuilder } from "@react-navigation/native";
 import { StyleSheet, Text, View } from "react-native";
-import { version } from './../../package.json';
 import { displayName } from './../../app.json';
 import Icon from "react-native-vector-icons/FontAwesome5";
+import { getVersion } from "react-native-device-info";
 
 /**
  *
@@ -93,7 +93,7 @@ function Header() {
 function Footer() {
   return (
     <View style={styles.footerContainer}>
-      <Text style={styles.footerContent}>version: {version}</Text>
+      <Text style={styles.footerContent}>version: {getVersion()}</Text>
     </View>
   );
 }
