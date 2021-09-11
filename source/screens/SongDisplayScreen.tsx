@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { Button, FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 import { Song, Verse } from "../models/Songs";
-import { RouteProp, useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 import Db from "../scripts/db";
 import LoadingOverlay from "../components/LoadingOverlay";
-import GestureRecognizer from "react-native-swipe-gestures";
 import { routes } from "../navigation";
 import Settings from "../scripts/settings";
 import { PinchGestureHandler } from "react-native-gesture-handler";
