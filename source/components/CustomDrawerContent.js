@@ -3,6 +3,10 @@ import {
   DrawerContentScrollView, DrawerItem,
 } from "@react-navigation/drawer";
 import { CommonActions, DrawerActions, useLinkBuilder } from "@react-navigation/native";
+import { StyleSheet, Text, View } from "react-native";
+import { version } from './../../package.json';
+import { displayName } from './../../app.json';
+import Icon from "react-native-vector-icons/FontAwesome5";
 
 /**
  *
@@ -77,10 +81,63 @@ function CustomDrawerItemList({ state, navigation, descriptors }) {
     });
 }
 
-export default function CustomDrawerContent(props) {
+function Header() {
   return (
-    <DrawerContentScrollView {...props}>
-      <CustomDrawerItemList {...props} />
-    </DrawerContentScrollView>
+    <View style={styles.headerContainer}>
+      <Icon name={"book-open"} size={styles.headerIcon.fontSize} color={styles.headerIcon.color} />
+      <Text style={styles.headerContent}>{displayName}</Text>
+    </View>
   );
 }
+
+function Footer() {
+  return (
+    <View style={styles.footerContainer}>
+      <Text style={styles.footerContent}>version: {version}</Text>
+    </View>
+  );
+}
+
+export default function CustomDrawerContent(props) {
+  return (<>
+      <Header />
+      <DrawerContentScrollView {...props}>
+        <CustomDrawerItemList {...props} />
+      </DrawerContentScrollView>
+      <Footer />
+    </>
+  );
+}
+
+
+const styles = StyleSheet.create({
+  headerContainer: {
+    alignSelf: "stretch",
+    alignItems: "center",
+    paddingLeft: 20,
+    paddingRight: 10,
+    paddingTop: 25,
+    paddingBottom: 15,
+    flexDirection: "row",
+  },
+  headerIcon: {
+    color: "dodgerblue",
+    fontSize: 30,
+  },
+  headerContent: {
+    paddingLeft: 18,
+    color: "dodgerblue",
+    fontSize: 28,
+    fontFamily: "sans-serif-light",
+  },
+  footerContainer: {
+    alignSelf: "stretch",
+    padding: 10,
+  },
+  footerContent: {
+    textAlign: "center",
+    color: "#aaa",
+    fontSize: 12,
+    fontFamily: "sans-serif-light",
+  }
+});
