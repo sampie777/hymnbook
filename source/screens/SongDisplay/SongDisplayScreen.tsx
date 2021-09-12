@@ -10,32 +10,7 @@ import { PinchGestureHandler } from "react-native-gesture-handler";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { SongListSongModel } from "../../models/SongListModel";
 import SongListControls from "./SongListControls";
-
-interface ContentVerseProps {
-  title: string;
-  content: string;
-  scale: number;
-}
-
-const ContentVerse: React.FC<ContentVerseProps> = ({ title, content, scale }) => {
-  const scalableStyles = StyleSheet.create({
-    contentVerseTitle: {
-      fontSize: 14 * scale
-    },
-    contentVerseText: {
-      fontSize: Settings.songVerseTextSize * scale,
-      lineHeight: 25 * scale
-    }
-  });
-
-  return (
-    <View style={styles.contentVerse}>
-      {title === "" ? null :
-        <Text style={[styles.contentVerseTitle, scalableStyles.contentVerseTitle]}>{title}</Text>}
-      <Text style={[styles.contentVerseText, scalableStyles.contentVerseText]}>{content}</Text>
-    </View>
-  );
-};
+import ContentVerse from "./ContentVerse";
 
 const Footer: React.FC = () => (
   <View style={styles.footer} />
@@ -162,16 +137,6 @@ const styles = StyleSheet.create({
     paddingRight: 20,
     paddingBottom: 300
   },
-  contentVerse: {
-    marginBottom: 40
-  },
-  contentVerseTitle: {
-    color: "#777",
-    textTransform: "lowercase",
-    left: -10,
-    marginBottom: 7
-  },
-  contentVerseText: {},
 
   footer: {
     borderTopColor: "#ccc",
