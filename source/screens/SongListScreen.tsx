@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { BackHandler, Button, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Db from "../scripts/db";
 import { Song } from "../models/Songs";
 import { routes } from "../navigation";
@@ -10,17 +10,33 @@ import SongList from "../scripts/songList/songList";
 import { SongListModel, SongListSongModel } from "../models/SongListModel";
 import { CollectionChangeCallback } from "realm";
 
-const SongItem: React.FC<{ index: number, song: Song, onPress: (song: Song) => void }> =
-  ({ index, song, onPress }) => (
-    <TouchableOpacity onPress={() => onPress(song)} style={styles.songListItem}>
+const DeleteModeButton: React.FC<{ callback: () => void }> =
+  ({ callback }) => (
+    <TouchableOpacity onPress={callback}
+                      style={styles.deleteModeButton}>
+      <Icon name={"trash-alt"}
+            size={styles.deleteModeButton.fontSize}
+            color={styles.deleteModeButton.color} />
+    </TouchableOpacity>
+  );
+
+const SongItem: React.FC<{
+  index: number,
+  song: Song,
+  onPress: (index: number, song: Song) => void,
+  showDeleteButton: boolean,
+}> =
+  ({ index, song, onPress, showDeleteButton }) => (
+    <TouchableOpacity onPress={() => onPress(index, song)} style={styles.songListItem}>
       <Text style={styles.songListItemText}>{song.name}</Text>
 
-      <TouchableOpacity onPress={() => SongList.deleteSongAtIndex(index)}
-                        style={styles.songListItemButton}>
-        <Icon name={"times"}
-              size={styles.songListItemButton.fontSize}
-              color={styles.songListItemButton.color} />
-      </TouchableOpacity>
+      {!showDeleteButton ? undefined :
+        <View style={styles.songListItemButton}>
+          <Icon name={"times"}
+                size={styles.songListItemButton.fontSize}
+                color={styles.songListItemButton.color} />
+        </View>
+      }
     </TouchableOpacity>
   );
 
@@ -28,12 +44,19 @@ const SongListScreen: React.FC<{ navigation: DrawerNavigationProp<any> }> =
   ({ navigation }) => {
 
     const [list, setList] = useState<Array<SongListSongModel>>([]);
+    const [isDeleteMode, setIsDeleteMode] = useState(false);
+
+    React.useLayoutEffect(() => {
+      navigation.setOptions({
+        headerRight: () => (<DeleteModeButton callback={toggleDeleteMode} />)
+      });
+    }, [navigation]);
 
     useFocusEffect(
       React.useCallback(() => {
         onFocus();
         return onBlur;
-      }, [])
+      }, [isDeleteMode])
     );
 
     const reloadSongList = () => {
@@ -41,10 +64,20 @@ const SongListScreen: React.FC<{ navigation: DrawerNavigationProp<any> }> =
     };
 
     const onFocus = () => {
+      BackHandler.addEventListener("hardwareBackPress", onBackPress);
       reloadSongList();
     };
 
     const onBlur = () => {
+      BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+    };
+
+    const onBackPress = (): boolean => {
+      if (isDeleteMode) {
+        setIsDeleteMode(false);
+        return true;
+      }
+      return false;
     };
 
     useEffect(() => {
@@ -62,13 +95,21 @@ const SongListScreen: React.FC<{ navigation: DrawerNavigationProp<any> }> =
       reloadSongList();
     };
 
-    const onSearchResultItemPress = (song: Song) => {
+    const onSearchResultItemPress = (index: number, song: Song) => {
+      if (isDeleteMode) {
+        return SongList.deleteSongAtIndex(index);
+      }
       navigation.navigate(routes.Song, { id: song.id, previousScreen: routes.SongList });
     };
 
     const renderSongListItem = ({ item }: { item: SongListSongModel }) => (
-      <SongItem index={item.index} song={item.song} onPress={onSearchResultItemPress} />
+      <SongItem index={item.index}
+                song={item.song}
+                onPress={onSearchResultItemPress}
+                showDeleteButton={isDeleteMode} />
     );
+
+    const toggleDeleteMode = () => setIsDeleteMode(it => !it);
 
     return (
       <View style={styles.container}>
@@ -112,6 +153,12 @@ const styles = StyleSheet.create({
     padding: 15,
     fontSize: 24,
     color: "#f17c7c"
-  }
+  },
 
+  deleteModeButton: {
+    padding: 15,
+    right: 5,
+    fontSize: 24,
+    color: "#f17c7c"
+  }
 });
