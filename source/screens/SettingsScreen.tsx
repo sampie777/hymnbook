@@ -1,5 +1,5 @@
 import React, { MutableRefObject, useEffect, useRef, useState } from "react";
-import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Settings from "../scripts/settings";
 import { AccessRequestStatus, ServerAuth } from "../scripts/server/auth";
 import ConfirmationModal from "../components/ConfirmationModal";
@@ -40,6 +40,10 @@ const Setting: React.FC<SettingProps> =
       </TouchableOpacity>
     );
   };
+
+const Header: React.FC<{ title: string }> = ({ title }) => (
+  <Text style={styles.settingHeader}>{title}</Text>
+);
 
 interface ComponentProps {
 }
@@ -110,15 +114,13 @@ const SettingsScreen: React.FC<ComponentProps> = () => {
         <Text>{confirmModalMessage}</Text>
       </ConfirmationModal>
 
-      {/*<Setting name={"Max input length"} sKey={"maxSearchInputLength"} />*/}
-      {/*<Setting name={"Max. results to display"} sKey={"maxSearchResultsLength"} />*/}
-      {/*<Setting name={"SongBundle API URL"} sKey={"songBundlesApiUrl"} />*/}
-
       {isReloading ? null : <>
+        <Header title={"Layout"} />
         <Setting name={"Songs scale"} sKey={"songScale"}
                  onPress={(setValue) => setValue(1.0)}
                  valueRender={(it) => Math.round(it * 100) + " %"} />
 
+        <Header title={"Backend"} />
         <Setting name={"Use authentication with backend"} sKey={"useAuthentication"}
                  onPress={(setValue) => setValue(!Settings.useAuthentication)} />
         <Setting name={"Authentication status with backend"} value={authenticationStatus}
@@ -141,8 +143,18 @@ export default SettingsScreen;
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 20
   },
+
+  settingHeader: {
+    marginTop: 15,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    fontWeight: "bold",
+    fontSize: 15,
+    textTransform: "uppercase",
+    color: "#999"
+  },
+
   settingContainer: {
     paddingHorizontal: 20,
     paddingVertical: 15,
