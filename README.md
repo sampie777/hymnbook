@@ -38,6 +38,8 @@ yarn start --reset-cache
 ### Android 
 
 ```bash
+yarn build
+# OR
 cd android/
 ./gradlew assembleRelease 
 ```
