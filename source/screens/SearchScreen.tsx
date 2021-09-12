@@ -47,6 +47,9 @@ const SearchResultItem: React.FC<{ song: Song, onPress: (song: Song) => void }> 
       }, []));
 
     const addSongToSongList = () => {
+      if (songAddedToSongList) {
+        return; // Wait for cool down
+      }
       SongList.addSong(song);
       setSongAddedToSongList(true);
       timeout.current = setTimeout(() => setSongAddedToSongList(false), 3000);
