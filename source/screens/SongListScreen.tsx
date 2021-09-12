@@ -99,7 +99,11 @@ const SongListScreen: React.FC<{ navigation: DrawerNavigationProp<any> }> =
       if (isDeleteMode) {
         return SongList.deleteSongAtIndex(index);
       }
-      navigation.navigate(routes.Song, { id: song.id, previousScreen: routes.SongList });
+      navigation.navigate(routes.Song, {
+        id: song.id,
+        previousScreen: routes.SongList,
+        songListIndex: index,
+      });
     };
 
     const renderSongListItem = ({ item }: { item: SongListSongModel }) => (

@@ -1,13 +1,15 @@
 import React, { useState } from "react";
-import { BackHandler, FlatList, StyleSheet, Text, View } from "react-native";
-import { Song, Verse } from "../models/Songs";
+import { BackHandler, Button, FlatList, StyleSheet, Text, View } from "react-native";
+import { Song, Verse } from "../../models/Songs";
 import { useFocusEffect } from "@react-navigation/native";
-import Db from "../scripts/db";
-import LoadingOverlay from "../components/LoadingOverlay";
-import { routes } from "../navigation";
-import Settings from "../scripts/settings";
+import Db from "../../scripts/db";
+import LoadingOverlay from "../../components/LoadingOverlay";
+import { routes } from "../../navigation";
+import Settings from "../../scripts/settings";
 import { PinchGestureHandler } from "react-native-gesture-handler";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
+import { SongListSongModel } from "../../models/SongListModel";
+import SongListControls from "./SongListControls";
 
 interface ContentVerseProps {
   title: string;
@@ -39,7 +41,6 @@ const Footer: React.FC = () => (
   <View style={styles.footer} />
 );
 
-
 interface SongDisplayScreenProps {
   route: any;
   navigation: DrawerNavigationProp<any>;
@@ -58,13 +59,13 @@ const SongDisplayScreen: React.FC<SongDisplayScreenProps> = ({ route, navigation
   );
 
   const onFocus = () => {
-    BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    BackHandler.addEventListener("hardwareBackPress", onBackPress);
     setScale(Settings.songScale);
     loadSong();
   };
 
   const onBlur = () => {
-    BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    BackHandler.removeEventListener("hardwareBackPress", onBackPress);
     setSong(undefined);
     navigation.setOptions({ title: "" });
   };
@@ -76,7 +77,7 @@ const SongDisplayScreen: React.FC<SongDisplayScreenProps> = ({ route, navigation
 
     navigation.navigate(route.params.previousScreen);
     return true;
-  }
+  };
 
   const loadSong = () => {
     if (!Db.songs.isConnected()) {
@@ -108,31 +109,12 @@ const SongDisplayScreen: React.FC<SongDisplayScreenProps> = ({ route, navigation
     );
   };
 
-  const nextSong = () => {
-    if (song === undefined) {
-      return;
-    }
-    navigateToSongMatching(song.id + 1);
-  };
-
-  const previousSong = () => {
-    if (song === undefined) {
-      return;
-    }
-    navigateToSongMatching(song.id - 1);
-  };
-
-  const navigateToSongMatching = (id: number) => {
-    setIsLoading(true);
-
-    const newSong = Db.songs.realm().objectForPrimaryKey(Song.schema.name, id);
-
-    if (newSong === undefined) {
-      setIsLoading(false);
-      return;
-    }
-
-    navigation.navigate(routes.Song, { id: id });
+  const goToSongListSong = (songListSong: SongListSongModel) => {
+    navigation.navigate(routes.Song, {
+      id: songListSong.song.id,
+      previousScreen: routes.SongList,
+      songListIndex: songListSong.index,
+    });
   };
 
   const _onPanGestureEvent = () => {
@@ -149,6 +131,10 @@ const SongDisplayScreen: React.FC<SongDisplayScreenProps> = ({ route, navigation
       onGestureEvent={_onPanGestureEvent}
       onHandlerStateChange={_onPinchHandlerStateChange}>
       <View style={styles.container}>
+        {route.params.songListIndex === undefined ? undefined :
+          <SongListControls index={route.params.songListIndex}
+                            goToSongListSong={goToSongListSong} />}
+
         <FlatList
           data={song?.verses}
           renderItem={renderContentItem}

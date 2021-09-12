@@ -69,9 +69,25 @@ export default class SongList {
     });
   }
 
-  static previousSong() {
+  static previousSong(currentIndex: number): SongListSongModel | undefined {
+    const songList = this.getFirstSongList();
+    if (songList === undefined) return undefined;
+
+    if (currentIndex === 0) {
+      return undefined
+    }
+
+    return songList.songs.find(it => it.index === currentIndex - 1);
   }
 
-  static nextSong() {
+  static nextSong(currentIndex: number): SongListSongModel | undefined {
+    const songList = this.getFirstSongList();
+    if (songList === undefined) return undefined;
+
+    if (currentIndex === songList.songs.length - 1) {
+      return undefined
+    }
+
+    return songList.songs.find(it => it.index === currentIndex + 1);
   }
 }

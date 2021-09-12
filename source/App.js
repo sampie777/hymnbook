@@ -12,7 +12,7 @@ import { createDrawerNavigator } from "@react-navigation/drawer";
 import { NavigationContainer } from "@react-navigation/native";
 import { routes } from "./navigation";
 import SearchScreen from "./screens/SearchScreen";
-import SongDisplayScreen from "./screens/SongDisplayScreen";
+import SongDisplayScreen from "./screens/SongDisplay/SongDisplayScreen";
 import Db from "./scripts/db";
 import CustomDrawerContent from "./components/CustomDrawerContent";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -82,6 +82,7 @@ export default function App() {
                          initialParams={{
                            id: undefined,
                            previousScreen: undefined,
+                           songListIndex: undefined,
                          }}
                          options={{
                            hideInMenu: true,
