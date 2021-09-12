@@ -59,7 +59,9 @@ const SearchResultItem: React.FC<{ song: Song, onPress: (song: Song) => void }> 
                         style={styles.searchListItemButton}>
         <Icon name={songAddedToSongList ? "check" : "plus"}
               size={styles.searchListItemButton.fontSize}
-              color={styles.searchListItemButton.color} />
+              color={songAddedToSongList
+                ? styles.searchListItemButtonHighlight.color
+                : styles.searchListItemButton.color} />
       </TouchableOpacity>
     </TouchableOpacity>);
   };
@@ -237,6 +239,9 @@ const styles = StyleSheet.create({
   searchListItemButton: {
     padding: 15,
     fontSize: 24,
+    color: "#9fec9f"
+  },
+  searchListItemButtonHighlight: {
     color: "#2fd32f"
   },
 

@@ -94,7 +94,7 @@ const SettingsScreen: React.FC<ComponentProps> = () => {
     } else if (Settings.authStatus === AccessRequestStatus.REQUESTED) {
       return "Requested...";
     }
-    return "No";
+    return "Not authenticated";
   }
 
   let authenticationStatus = getAuthenticationStateAsMessage();
