@@ -1,6 +1,7 @@
 import { Setting } from "../models/Settings";
 import Db from "./db";
 import { AccessRequestStatus } from "./server/auth";
+import { getFontScale } from "react-native-device-info";
 
 class SettingsProvider {
   static set(key: string, value: string) {
@@ -68,7 +69,6 @@ class SettingsClass {
   songBundlesApiUrl = "http://192.168.0.148:8080";
 
   songScale = 1.0;
-  songVerseTextSize = 18;
 
   // Server authentication
   useAuthentication = true;
@@ -80,13 +80,21 @@ class SettingsClass {
 
   load() {
     console.log("Loading settings");
-    Object.entries(this).forEach(([key, value]) => {
-      const dbValue = this.loadValueFor(key, value);
-      if (dbValue !== undefined) {
-        // @ts-ignore
-        this[key] = dbValue;
-      }
-    });
+
+    // First load system font scale as default before loading settings from database
+    getFontScale()
+      .then((it: number) => {
+        this.songScale = it;
+      })
+      .finally(() => {
+        Object.entries(this).forEach(([key, value]) => {
+          const dbValue = this.loadValueFor(key, value);
+          if (dbValue !== undefined) {
+            // @ts-ignore
+            this[key] = dbValue;
+          }
+        });
+      });
   }
 
   private loadValueFor(key: string, value: any) {

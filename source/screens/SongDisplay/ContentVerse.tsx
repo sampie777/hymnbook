@@ -1,6 +1,5 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import Settings from "../../scripts/settings";
 
 interface ContentVerseProps {
   title: string;
@@ -14,8 +13,8 @@ const ContentVerse: React.FC<ContentVerseProps> = ({ title, content, scale }) =>
       fontSize: 14 * scale
     },
     text: {
-      fontSize: Settings.songVerseTextSize * scale,
-      lineHeight: 25 * scale
+      fontSize: 18 * scale,
+      lineHeight: 30 * scale
     }
   });
 
@@ -32,13 +31,13 @@ export default ContentVerse;
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 40
+    marginBottom: 50
   },
   title: {
     color: "#777",
     textTransform: "lowercase",
     left: -10,
-    marginBottom: 7
+    marginBottom: 7,
   },
   text: {},
 });

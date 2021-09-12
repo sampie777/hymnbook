@@ -4,6 +4,7 @@ import Settings from "../scripts/settings";
 import { AccessRequestStatus, ServerAuth } from "../scripts/server/auth";
 import ConfirmationModal from "../components/ConfirmationModal";
 import { useFocusEffect } from "@react-navigation/native";
+import { getFontScale } from "react-native-device-info";
 
 interface SettingProps {
   name: string;
@@ -117,7 +118,7 @@ const SettingsScreen: React.FC<ComponentProps> = () => {
       {isReloading ? null : <>
         <Header title={"Layout"} />
         <Setting name={"Songs scale"} sKey={"songScale"}
-                 onPress={(setValue) => setValue(1.0)}
+                 onPress={(setValue) => getFontScale().then((it: number) => setValue(it))}
                  valueRender={(it) => Math.round(it * 100) + " %"} />
 
         <Header title={"Backend"} />

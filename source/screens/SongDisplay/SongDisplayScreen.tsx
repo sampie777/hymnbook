@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { BackHandler, Button, FlatList, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { BackHandler, FlatList, StyleSheet, Text, View } from "react-native";
 import { Song, Verse } from "../../models/Songs";
 import { useFocusEffect } from "@react-navigation/native";
 import Db from "../../scripts/db";
@@ -54,6 +54,10 @@ const SongDisplayScreen: React.FC<SongDisplayScreenProps> = ({ route, navigation
     return true;
   };
 
+  useEffect(() => {
+    Settings.songScale = scale;
+  }, [scale]);
+
   const loadSong = () => {
     if (!Db.songs.isConnected()) {
       return;
@@ -80,7 +84,9 @@ const SongDisplayScreen: React.FC<SongDisplayScreenProps> = ({ route, navigation
 
   const renderContentItem = ({ item }: { item: Verse }) => {
     return (
-      <ContentVerse title={item.name} content={item.content} scale={scale} />
+      <ContentVerse title={item.name}
+                    content={item.content}
+                    scale={scale} />
     );
   };
 
@@ -88,7 +94,7 @@ const SongDisplayScreen: React.FC<SongDisplayScreenProps> = ({ route, navigation
     navigation.navigate(routes.Song, {
       id: songListSong.song.id,
       previousScreen: routes.SongList,
-      songListIndex: songListSong.index,
+      songListIndex: songListSong.index
     });
   };
 
@@ -97,8 +103,7 @@ const SongDisplayScreen: React.FC<SongDisplayScreenProps> = ({ route, navigation
   };
 
   const _onPinchHandlerStateChange = (event: any) => {
-    setScale(scale * event.nativeEvent.scale);
-    Settings.songScale = scale;
+    setScale(it => it * event.nativeEvent.scale);
   };
 
   return (
