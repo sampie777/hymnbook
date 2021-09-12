@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Db from "../scripts/db";
 import { Song } from "../models/Songs";
@@ -37,12 +37,20 @@ const NumberKey: React.FC<{ number: number, onPress: (number: number) => void }>
 const SearchResultItem: React.FC<{ song: Song, onPress: (song: Song) => void }> =
   ({ song, onPress }) => {
     const [songAddedToSongList, setSongAddedToSongList] = useState(false);
+    const timeout = useRef<NodeJS.Timeout>();
+
+    useFocusEffect(React.useCallback(() =>
+      () => { // on blur
+        if (timeout.current !== undefined) {
+          clearTimeout(timeout.current);
+        }
+      }, []));
 
     const addSongToSongList = () => {
       SongList.addSong(song);
       setSongAddedToSongList(true);
-      setTimeout(() => setSongAddedToSongList(false), 3000);
-    }
+      timeout.current = setTimeout(() => setSongAddedToSongList(false), 3000);
+    };
 
     return (<TouchableOpacity onPress={() => onPress(song)} style={styles.searchListItem}>
       <Text style={styles.searchListItemText}>{song.name}</Text>
