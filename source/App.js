@@ -78,9 +78,11 @@ export default function App() {
                              <Icon name="cogs" size={size} color={color} />,
                          }} />
 
+          {/* Hidden screens */}
           <Drawer.Screen name={routes.Song} component={SongDisplayScreen}
                          initialParams={{
                            id: undefined,
+                           previousScreen: undefined,
                          }}
                          options={{
                            hideInMenu: true,

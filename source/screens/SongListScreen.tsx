@@ -63,7 +63,7 @@ const SongListScreen: React.FC<{ navigation: DrawerNavigationProp<any> }> =
     };
 
     const onSearchResultItemPress = (song: Song) => {
-      navigation.navigate(routes.Song, { id: song.id });
+      navigation.navigate(routes.Song, { id: song.id, previousScreen: routes.SongList });
     };
 
     const renderSongListItem = ({ item }: { item: SongListSongModel }) => (

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { BackHandler, FlatList, StyleSheet, Text, View } from "react-native";
 import { Song, Verse } from "../models/Songs";
 import { useFocusEffect } from "@react-navigation/native";
 import Db from "../scripts/db";
@@ -7,6 +7,7 @@ import LoadingOverlay from "../components/LoadingOverlay";
 import { routes } from "../navigation";
 import Settings from "../scripts/settings";
 import { PinchGestureHandler } from "react-native-gesture-handler";
+import { DrawerNavigationProp } from "@react-navigation/drawer";
 
 interface ContentVerseProps {
   title: string;
@@ -41,7 +42,7 @@ const Footer: React.FC = () => (
 
 interface SongDisplayScreenProps {
   route: any;
-  navigation: any;
+  navigation: DrawerNavigationProp<any>;
 }
 
 const SongDisplayScreen: React.FC<SongDisplayScreenProps> = ({ route, navigation }) => {
@@ -53,18 +54,29 @@ const SongDisplayScreen: React.FC<SongDisplayScreenProps> = ({ route, navigation
     React.useCallback(() => {
       onFocus();
       return onBlur;
-    }, [route.params.id])
+    }, [route.params.id, route.params.previousScreen])
   );
 
   const onFocus = () => {
+    BackHandler.addEventListener('hardwareBackPress', onBackPress);
     setScale(Settings.songScale);
     loadSong();
   };
 
   const onBlur = () => {
+    BackHandler.removeEventListener('hardwareBackPress', onBackPress);
     setSong(undefined);
     navigation.setOptions({ title: "" });
   };
+
+  const onBackPress = (): boolean => {
+    if (route.params.previousScreen === undefined) {
+      return false;
+    }
+
+    navigation.navigate(route.params.previousScreen);
+    return true;
+  }
 
   const loadSong = () => {
     if (!Db.songs.isConnected()) {
