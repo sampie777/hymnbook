@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   deleteModeButton: {
     padding: 15,
     right: 5,
-    fontSize: 24,
+    fontSize: 21,
     color: "#f17c7c"
   }
 });
