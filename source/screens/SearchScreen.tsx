@@ -3,9 +3,10 @@ import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native
 import Db from "../scripts/db";
 import { Song } from "../models/Songs";
 import { routes } from "../navigation";
-import Icon from "react-native-vector-icons/MaterialIcons";
+import Icon from "react-native-vector-icons/FontAwesome5";
 import { useFocusEffect } from "@react-navigation/native";
 import Settings from "../scripts/settings";
+import SongList from "../scripts/songList/songList";
 
 interface KeyProps {
   onPress: () => void;
@@ -34,11 +35,26 @@ const NumberKey: React.FC<{ number: number, onPress: (number: number) => void }>
   );
 
 const SearchResultItem: React.FC<{ song: Song, onPress: (song: Song) => void }> =
-  ({ song, onPress }) => (
-    <TouchableOpacity onPress={() => onPress(song)}>
-      <Text style={styles.searchListItem}>{song.name}</Text>
-    </TouchableOpacity>
-  );
+  ({ song, onPress }) => {
+    const [songAddedToSongList, setSongAddedToSongList] = useState(false);
+
+    const addSongToSongList = () => {
+      SongList.addSong(song);
+      setSongAddedToSongList(true);
+      setTimeout(() => setSongAddedToSongList(false), 3000);
+    }
+
+    return (<TouchableOpacity onPress={() => onPress(song)} style={styles.searchListItem}>
+      <Text style={styles.searchListItemText}>{song.name}</Text>
+
+      <TouchableOpacity onPress={addSongToSongList}
+                        style={styles.searchListItemButton}>
+        <Icon name={songAddedToSongList ? "check" : "plus"}
+              size={styles.searchListItemButton.fontSize}
+              color={styles.searchListItemButton.color} />
+      </TouchableOpacity>
+    </TouchableOpacity>);
+  };
 
 const SearchScreen: React.FC<{ navigation: any }> =
   ({ navigation }) => {
@@ -56,10 +72,11 @@ const SearchScreen: React.FC<{ navigation: any }> =
     );
 
     const onFocus = () => {
-      fetchSearchResults();
     };
 
     const onBlur = () => {
+      setInputValue("");
+      setSearchResult([]);
     };
 
     useEffect(() => {
@@ -107,8 +124,7 @@ const SearchScreen: React.FC<{ navigation: any }> =
     };
 
     const onSearchResultItemPress = (song: Song) => {
-      navigation.navigate(routes.Song, { id: song.id, query: inputValue });
-      setInputValue("");
+      navigation.navigate(routes.Song, { id: song.id });
     };
 
     const renderSearchResultItem = ({ item }: { item: Song }) => (
@@ -198,12 +214,22 @@ const styles = StyleSheet.create({
     paddingTop: 20
   },
   searchListItem: {
-    fontSize: 24,
-    padding: 15,
     marginBottom: 1,
     backgroundColor: "#fcfcfc",
     borderColor: "#ddd",
-    borderBottomWidth: 1
+    borderBottomWidth: 1,
+    flexDirection: "row",
+    alignItems: "center"
+  },
+  searchListItemText: {
+    padding: 15,
+    fontSize: 24,
+    flex: 1
+  },
+  searchListItemButton: {
+    padding: 15,
+    fontSize: 24,
+    color: "#2fd32f"
   },
 
   keyPad: {

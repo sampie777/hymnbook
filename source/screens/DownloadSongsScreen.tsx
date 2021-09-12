@@ -98,7 +98,11 @@ const DownloadSongsScreen: React.FC<ComponentProps> = () => {
     result.alert();
     result.throwIfException();
 
-    setLocalBundles(result.data);
+    if (result.data !== undefined) {
+      setLocalBundles(result.data);
+    } else {
+      setLocalBundles([]);
+    }
     setIsLoading(false);
   };
 

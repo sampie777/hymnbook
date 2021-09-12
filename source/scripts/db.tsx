@@ -1,6 +1,7 @@
 import Realm, { ObjectClass, ObjectSchema } from "realm";
 import { Song, SongBundle, Verse } from "../models/Songs";
 import { Setting } from "../models/Settings";
+import { SongListModel, SongListSongModel } from "../models/SongListModel";
 
 interface DatabaseProps {
   path: string;
@@ -90,7 +91,7 @@ class Database {
 const Db = {
   songs: new Database({
     path: "hymnbook_songs",
-    schemas: [Verse.schema, Song.schema, SongBundle.schema],
+    schemas: [Verse.schema, Song.schema, SongBundle.schema, SongListSongModel.schema, SongListModel.schema],
     schemaVersion: 1
   }),
   settings: new Database({

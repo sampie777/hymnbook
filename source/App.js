@@ -9,7 +9,7 @@
 import React, { useEffect } from "react";
 import { SafeAreaView, StatusBar, StyleSheet, View } from "react-native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import { NavigationContainer, useFocusEffect } from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { routes } from "./navigation";
 import SearchScreen from "./screens/SearchScreen";
 import SongDisplayScreen from "./screens/SongDisplayScreen";
@@ -19,6 +19,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import DownloadSongsScreen from "./screens/DownloadSongsScreen";
 import Settings from "./scripts/settings";
 import SettingsScreen from "./screens/SettingsScreen";
+import SongListScreen from "./screens/SongListScreen";
 
 const Drawer = createDrawerNavigator();
 
@@ -60,6 +61,12 @@ export default function App() {
                            drawerIcon: ({ focused, color, size }) =>
                              <Icon name="search" size={size} color={color} />,
                          }} />
+          <Drawer.Screen name={routes.SongList} component={SongListScreen}
+                         options={{
+                           title: "Song list",
+                           drawerIcon: ({ focused, color, size }) =>
+                             <Icon name="list-ul" size={size} color={color} />,
+                         }} />
           <Drawer.Screen name={routes.Import} component={DownloadSongsScreen}
                          options={{
                            drawerIcon: ({ focused, color, size }) =>
@@ -74,7 +81,6 @@ export default function App() {
           <Drawer.Screen name={routes.Song} component={SongDisplayScreen}
                          initialParams={{
                            id: undefined,
-                           query: undefined,
                          }}
                          options={{
                            hideInMenu: true,
