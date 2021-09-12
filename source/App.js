@@ -31,6 +31,7 @@ export default function App() {
 
   const onLaunch = () => {
     Db.settings.connect()
+      .then(() => Settings.load())
       .catch(e => {
         console.error("Could not connect to local settings database", e);
         alert("Could not connect to local settings database: " + e);
@@ -41,8 +42,6 @@ export default function App() {
         console.error("Could not connect to local song database", e);
         alert("Could not connect to local song database: " + e);
       });
-
-    Settings.load();
   };
 
   const onExit = () => {
