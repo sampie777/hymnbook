@@ -102,7 +102,7 @@ const SongListScreen: React.FC<{ navigation: DrawerNavigationProp<any> }> =
       navigation.navigate(routes.Song, {
         id: song.id,
         previousScreen: routes.SongList,
-        songListIndex: index,
+        songListIndex: index
       });
     };
 
@@ -155,7 +155,8 @@ const styles = StyleSheet.create({
   },
   songListItemButton: {
     padding: 15,
-    fontSize: 24,
+    right: 7,
+    fontSize: 21,
     color: "#f17c7c"
   },
 
