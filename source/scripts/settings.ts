@@ -1,7 +1,6 @@
 import { Setting } from "../models/Settings";
 import Db from "./db";
 import { AccessRequestStatus } from "./server/auth";
-import { getFontScale } from "react-native-device-info";
 
 class SettingsProvider {
   static set(key: string, value: string) {
@@ -83,20 +82,13 @@ class SettingsClass {
   load() {
     console.log("Loading settings");
 
-    // First load system font scale as default before loading settings from database
-    getFontScale()
-      .then((it: number) => {
-        this.songScale = it;
-      })
-      .finally(() => {
-        Object.entries(this).forEach(([key, value]) => {
-          const dbValue = this.loadValueFor(key, value);
-          if (dbValue !== undefined) {
-            // @ts-ignore
-            this[key] = dbValue;
-          }
-        });
-      });
+    Object.entries(this).forEach(([key, value]) => {
+      const dbValue = this.loadValueFor(key, value);
+      if (dbValue !== undefined) {
+        // @ts-ignore
+        this[key] = dbValue;
+      }
+    });
   }
 
   private loadValueFor(key: string, value: any) {

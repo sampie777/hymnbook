@@ -80,7 +80,7 @@ const SettingsScreen: React.FC = () => {
         <Header title={"Layout"} />
         <SettingComponent name={"Songs scale"}
                           sKey={"songScale"}
-                          onPress={(setValue) => getFontScale().then((it: number) => setValue(it))}
+                          onPress={(setValue) => setValue(1)}
                           valueRender={(it) => Math.round(it * 100) + " %"} />
         <SettingSwitchComponent name={"Animate scroll to top"}
                                 sKey={"scrollToTopAnimated"}

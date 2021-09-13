@@ -50,7 +50,7 @@ export const SettingComponent: React.FC<SettingProps> =
   };
 
 export const SettingSwitchComponent: React.FC<SettingProps> =
-  ({ name, sKey, value, onPress = undefined}) => {
+  ({ name, sKey, value, onPress = undefined }) => {
 
     if (value === undefined && sKey !== undefined) {
       value = Settings.get(sKey);
@@ -76,7 +76,8 @@ export const SettingSwitchComponent: React.FC<SettingProps> =
       <View style={[styles.container, styles.switchContainer]}>
         <Text style={styles.keyText}>{name}</Text>
         {value === undefined ? undefined :
-          <Switch onValueChange={onPress === undefined ? undefined : (newValue) => onPress(setValue, sKey, newValue)}
+          <Switch onValueChange={onPress === undefined ? undefined :
+            (newValue) => onPress(setValue, sKey, newValue)}
                   thumbColor={"dodgerblue"}
                   value={_value} />}
       </View>
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
   switchContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingTop: 17,
+    alignItems: "center"
   },
 
   keyText: {
