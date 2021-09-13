@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { BackHandler, FlatList, StyleSheet, Text, View } from "react-native";
 import { Song, Verse } from "../../models/Songs";
 import { useFocusEffect } from "@react-navigation/native";
@@ -25,6 +25,7 @@ const SongDisplayScreen: React.FC<SongDisplayScreenProps> = ({ route, navigation
   const [song, setSong] = useState<Song | undefined>(undefined);
   const [scale, setScale] = useState(Settings.songScale);
   const [isLoading, setIsLoading] = useState(false);
+  const flatListComponentRef = useRef<FlatList>();
 
   useFocusEffect(
     React.useCallback(() => {
@@ -54,9 +55,17 @@ const SongDisplayScreen: React.FC<SongDisplayScreenProps> = ({ route, navigation
     return true;
   };
 
-  useEffect(() => {
-    Settings.songScale = scale;
-  }, [scale]);
+  useEffect(React.useCallback(() => {
+      Settings.songScale = scale;
+    }, [scale])
+  );
+
+  useEffect(React.useCallback(() => {
+      flatListComponentRef.current?.scrollToOffset({
+        offset: 0
+      });
+    }, [song])
+  );
 
   const loadSong = () => {
     if (!Db.songs.isConnected()) {
@@ -103,7 +112,12 @@ const SongDisplayScreen: React.FC<SongDisplayScreenProps> = ({ route, navigation
   };
 
   const _onPinchHandlerStateChange = (event: any) => {
-    setScale(it => it * event.nativeEvent.scale);
+    setScale(it => {
+      if (event != null && event.nativeEvent != null && event.nativeEvent.scale != null) {
+        return it * event.nativeEvent.scale;
+      }
+      return it;
+    });
   };
 
   return (
@@ -116,6 +130,8 @@ const SongDisplayScreen: React.FC<SongDisplayScreenProps> = ({ route, navigation
                             goToSongListSong={goToSongListSong} />}
 
         <FlatList
+          // @ts-ignore
+          ref={flatListComponentRef}
           data={song?.verses}
           renderItem={renderContentItem}
           contentContainerStyle={styles.contentSectionList}

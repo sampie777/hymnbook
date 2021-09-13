@@ -41,7 +41,6 @@ const styles = StyleSheet.create({
     width: "100%",
     bottom: 30,
     paddingHorizontal: 20,
-    zIndex: 10
   },
 
   button: {
@@ -52,6 +51,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     shadowColor: "#000",
+    zIndex: 10,
     shadowOffset: {
       width: 0,
       height: 2
