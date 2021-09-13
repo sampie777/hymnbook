@@ -18,7 +18,7 @@ import CustomDrawerContent from "./components/CustomDrawerContent";
 import Icon from "react-native-vector-icons/FontAwesome";
 import DownloadSongsScreen from "./screens/DownloadSongsScreen";
 import Settings from "./scripts/settings";
-import SettingsScreen from "./screens/SettingsScreen";
+import SettingsScreen from "./screens/Settings/SettingsScreen";
 import SongListScreen from "./screens/SongListScreen";
 
 const Drawer = createDrawerNavigator();

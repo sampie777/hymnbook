@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 9,
   },
   icon: {
     fontSize: 80,
