@@ -24,7 +24,6 @@ interface SongDisplayScreenProps {
 const SongDisplayScreen: React.FC<SongDisplayScreenProps> = ({ route, navigation }) => {
   const [song, setSong] = useState<Song | undefined>(undefined);
   const [scale, setScale] = useState(Settings.songScale);
-  const [isLoading, setIsLoading] = useState(false);
   const flatListComponentRef = useRef<FlatList>();
 
   useFocusEffect(
@@ -60,22 +59,20 @@ const SongDisplayScreen: React.FC<SongDisplayScreenProps> = ({ route, navigation
     }, [scale])
   );
 
-  useEffect(React.useCallback(() => {
-      flatListComponentRef.current?.scrollToOffset({
-        offset: 0
-      });
-    }, [song])
-  );
+  const scrollToTop = () => {
+    flatListComponentRef.current?.scrollToOffset({
+      offset: 0,
+      animated: Settings.scrollToTopAnimated
+    });
+  };
 
   const loadSong = () => {
     if (!Db.songs.isConnected()) {
       return;
     }
-    setIsLoading(true);
 
     if (route.params.id === undefined) {
       setSong(undefined);
-      setIsLoading(false);
       return;
     }
 
@@ -88,7 +85,7 @@ const SongDisplayScreen: React.FC<SongDisplayScreenProps> = ({ route, navigation
 
     setSong(newSong);
     navigation.setOptions({ title: newSong?.name });
-    setIsLoading(false);
+    scrollToTop();
   };
 
   const renderContentItem = ({ item }: { item: Verse }) => {
@@ -137,7 +134,10 @@ const SongDisplayScreen: React.FC<SongDisplayScreenProps> = ({ route, navigation
           contentContainerStyle={styles.contentSectionList}
           ListFooterComponent={<Footer />} />
 
-        <LoadingOverlay text={null} isVisible={isLoading} />
+        <LoadingOverlay text={null}
+                        isVisible={
+                          route.params.id !== undefined
+                          && (song === undefined || song.id !== route.params.id)} />
       </View>
     </PinchGestureHandler>
   );

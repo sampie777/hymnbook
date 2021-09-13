@@ -5,6 +5,7 @@ import { AccessRequestStatus, ServerAuth } from "../scripts/server/auth";
 import ConfirmationModal from "../components/ConfirmationModal";
 import { useFocusEffect } from "@react-navigation/native";
 import { getFontScale } from "react-native-device-info";
+import { capitalize } from "../scripts/utils";
 
 interface SettingProps {
   name: string;
@@ -15,7 +16,8 @@ interface SettingProps {
 }
 
 const Setting: React.FC<SettingProps> =
-  ({ name, sKey, value, onPress = undefined, valueRender = (it) => it.toString() }) => {
+  ({ name, sKey, value, onPress = undefined, valueRender = undefined }) => {
+
     if (value === undefined && sKey !== undefined) {
       value = Settings.get(sKey);
     }
@@ -31,6 +33,15 @@ const Setting: React.FC<SettingProps> =
         _setValue(newValue);
       }
     };
+
+    if (valueRender === undefined) {
+      valueRender = (it) => {
+        if (typeof it === "boolean") {
+          return capitalize(it.toString());
+        }
+        return it.toString();
+      };
+    }
 
     return (
       <TouchableOpacity
@@ -120,6 +131,8 @@ const SettingsScreen: React.FC<ComponentProps> = () => {
         <Setting name={"Songs scale"} sKey={"songScale"}
                  onPress={(setValue) => getFontScale().then((it: number) => setValue(it))}
                  valueRender={(it) => Math.round(it * 100) + " %"} />
+        <Setting name={"Animate scroll to top"} sKey={"scrollToTopAnimated"}
+                 onPress={(setValue) => setValue(!Settings.scrollToTopAnimated)} />
 
         <Header title={"Backend"} />
         <Setting name={"Use authentication with backend"} sKey={"useAuthentication"}
@@ -143,8 +156,7 @@ export default SettingsScreen;
 
 
 const styles = StyleSheet.create({
-  container: {
-  },
+  container: {},
 
   settingHeader: {
     marginTop: 15,

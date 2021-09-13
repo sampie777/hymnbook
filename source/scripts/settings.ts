@@ -68,7 +68,9 @@ class SettingsClass {
 
   songBundlesApiUrl = "http://192.168.0.148:8080";
 
+  // Songs
   songScale = 1.0;
+  scrollToTopAnimated = true;
 
   // Server authentication
   useAuthentication = true;

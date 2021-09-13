@@ -40,3 +40,15 @@ export class Result {
     }
   }
 }
+
+export function capitalize(word: string) {
+  if (word.length === 0) {
+    return word;
+  }
+
+  if (word.length === 1) {
+    return word.toUpperCase();
+  }
+
+  return word.charAt(0).toUpperCase() + word.substring(1);
+}
