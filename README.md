@@ -1,3 +1,6 @@
+# DISCONTINUED
+# Check out the new project at https://github.com/sampie777/hymnbook2
+
 # Hymn book
 
 _App name may vary on project name_
